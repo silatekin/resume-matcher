@@ -1,0 +1,31 @@
+Software Engineer (Full-Stack)
+
+Company: TechNova Inc.
+Location: Remote
+Job Type: Full-time
+Salary Range: 110,000–110,000–150,000
+
+Job Description:
+We’re seeking a Full-Stack Engineer to build scalable web applications. You’ll work with React, Node.js, and AWS to deliver high-performance features.
+
+Responsibilities:
+
+    Develop and maintain frontend (React) and backend (Node.js) services.
+
+    Optimize APIs for speed and scalability.
+
+    Collaborate with product managers on feature design.
+
+Requirements:
+
+    3+ years of experience with JavaScript/TypeScript.
+
+    Proficiency in RESTful APIs and databases (SQL/NoSQL).
+
+    Familiarity with AWS (Lambda, S3) is a plus.
+
+Nice-to-Have:
+
+    Experience with Docker/Kubernetes.
+
+    Contributions to open-source projects.

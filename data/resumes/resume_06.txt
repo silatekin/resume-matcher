@@ -1,0 +1,21 @@
+Financial Analyst
+
+Name: Rachel Lee
+Email: rachel.lee@email.com | Phone: (555) 345-6789
+
+Summary:
+Finance professional with expertise in investment analysis and financial modeling.
+
+Experience:
+
+    Financial Analyst, Capital Investments (2021–Present)
+
+        Built valuation models for M&A deals.
+
+    Investment Intern, WealthBank (2019–2021)
+
+        Assisted in portfolio management.
+
+Skills: Excel, Financial Modeling, Bloomberg Terminal
+
+Education: B.S. in Finance, Business School (2019)

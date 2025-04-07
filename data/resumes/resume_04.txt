@@ -1,0 +1,24 @@
+Data Analyst
+
+Name: David Kim
+Email: david.kim@email.com | Phone: (555) 456-7890
+LinkedIn: linkedin.com/in/davidkim
+
+Summary:
+Data-driven analyst with expertise in Python, SQL, and Tableau.
+
+Experience:
+
+    Data Analyst, DataInsights (2020–Present)
+
+        Built predictive models using Python and scikit-learn.
+
+        Automated reports, saving 10+ hours per week.
+
+    Business Analyst, FinCorp (2018–2020)
+
+        Analyzed customer trends to improve retention.
+
+Skills: Python, SQL, Tableau, Excel
+
+Education: B.S. in Statistics, State University (2018)

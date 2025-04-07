@@ -1,0 +1,19 @@
+Mechanical Engineer
+
+Name: Lisa Wong
+Email: lisa.wong@email.com | Phone: (555) 901-2345
+
+Summary:
+Engineer with expertise in product design and CAD modeling.
+
+Experience:
+
+    Mechanical Engineer, AutoTech (2020–Present)
+
+        Designed automotive components using SolidWorks.
+
+    Engineering Intern, MechSolutions (2018–2020)
+
+Skills: CAD, Finite Element Analysis, Prototyping
+
+Education: B.S. in Mechanical Engineering, Tech University (2018)

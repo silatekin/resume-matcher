@@ -1,0 +1,22 @@
+Registered Nurse
+
+Name: Emily Carter
+Email: emily.carter@email.com | Phone: (555) 789-0123
+LinkedIn: linkedin.com/in/emilycarter
+
+Summary:
+Compassionate RN with 6+ years of experience in critical care.
+
+Experience:
+
+    ICU Nurse, City Hospital (2019–Present)
+
+        Monitored critically ill patients and assisted in life-saving procedures.
+
+    Staff Nurse, Community Clinic (2016–2019)
+
+        Provided primary care and patient education.
+
+Skills: Patient Care, Emergency Response, EHR Systems
+
+Education: BSN, Nursing College (2016)

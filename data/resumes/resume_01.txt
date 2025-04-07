@@ -1,0 +1,24 @@
+ Software Engineer
+
+Name: Alex Johnson
+Email: alex.johnson@email.com | Phone: (555) 123-4567
+LinkedIn: linkedin.com/in/alexjohnson | GitHub: github.com/alexjohnson
+
+Summary:
+Full-stack developer with 5+ years of experience in JavaScript, React, and Node.js. Passionate about building scalable web applications.
+
+Experience:
+
+    Senior Software Engineer, TechCorp (2021–Present)
+
+        Led a team to build a customer dashboard using React and Redux.
+
+        Improved API response time by 30% by optimizing backend queries.
+
+    Software Developer, WebSolutions (2018–2021)
+
+        Developed RESTful APIs using Node.js and Express.
+
+Skills: JavaScript, React, Node.js, Python, SQL
+
+Education: B.S. in Computer Science, University of XYZ (2018)

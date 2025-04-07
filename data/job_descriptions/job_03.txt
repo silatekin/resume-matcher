@@ -1,0 +1,29 @@
+Data Analyst
+
+Company: DataSphere Analytics
+Location: Chicago, IL
+Job Type: Full-time
+Salary Range: 70,000–70,000–90,000
+
+Job Description:
+Turn raw data into actionable insights using SQL, Python, and visualization tools.
+
+Responsibilities:
+
+    Build dashboards (Tableau/Power BI) for stakeholders.
+
+    Write complex SQL queries to extract trends.
+
+    Automate reports using Python scripts.
+
+Requirements:
+
+    2+ years in data analysis.
+
+    Proficiency in SQL, Python (pandas, NumPy).
+
+    Strong storytelling with data.
+
+Nice-to-Have:
+
+    Experience with machine learning basics.

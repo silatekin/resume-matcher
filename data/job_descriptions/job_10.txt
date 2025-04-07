@@ -1,0 +1,25 @@
+Mechanical Engineer
+
+Company: AutoInnovate
+Location: Detroit, MI
+Job Type: Full-time
+Salary Range: 90,000–90,000–115,000
+
+Job Description:
+Design automotive components using CAD and simulation tools.
+
+Responsibilities:
+
+    Create 3D models (SolidWorks).
+
+    Test prototypes for safety compliance.
+
+Requirements:
+
+    Bachelor’s in Mechanical Engineering.
+
+    2+ years in automotive design.
+
+Nice-to-Have:
+
+    FEA experience.
