@@ -1,0 +1,21 @@
+[
+    "python", "java", "javascript", "typescript", "c++", "c#", "go", "rust", "kotlin", "swift",
+    "php", "ruby", "scala", "r", "dart", "html", "css", "sass", "less", "bash",
+    "sql", "nosql", "mongodb", "postgresql", "mysql", "redis", "elasticsearch", "cassandra",
+    "docker", "kubernetes", "terraform", "ansible", "puppet", "chef", "jenkins", "github actions",
+    "aws", "azure", "gcp", "heroku", "digitalocean", "firebase", "linux", "windows server",
+    "react", "angular", "vue", "svelte", "next.js", "nuxt.js", "node.js", "express",
+    "django", "flask", "spring", "laravel", "ruby on rails", "asp.net", "graphql", "rest api",
+    "tensorflow", "pytorch", "keras", "opencv", "pandas", "numpy", "scikit-learn", "spark",
+    "hadoop", "tableau", "power bi", "looker", "snowflake", "airflow", "kafka", "rabbitmq",
+    "git", "svn", "mercurial", "jira", "confluence", "trello", "figma", "sketch",
+    "xd", "photoshop", "illustrator", "blender", "unity", "unreal engine", "arduino", "raspberry pi",
+    "blockchain", "solidity", "ethereum", "hyperledger", "cybersecurity", "penetration testing", "siem", "splunk",
+    "machine learning", "deep learning", "computer vision", "nlp", "ai", "data science", "big data", "data mining",
+    "microservices", "serverless", "ci/cd", "tdd", "agile", "scrum", "devops", "sre",
+    "embedded systems", "iot", "fpga", "verilog", "vhdl", "assembly", "matlab", "labview",
+    "electron", "react native", "flutter", "xamarin", "ionic", "cordova", "android", "ios",
+    "wordpress", "shopify", "magento", "drupal", "joomla", "squarespace", "webflow", "wix",
+    "selenium", "cypress", "jest", "mocha", "junit", "pytest", "cucumber", "postman",
+    "vim", "emacs", "vscode", "intellij", "eclipse", "xcode", "android studio", "netbeans"
+  ]
