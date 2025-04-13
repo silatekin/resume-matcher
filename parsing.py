@@ -3,6 +3,7 @@ import spacy
 import json
 from collections import defaultdict
 from datetime import datetime
+from spacy.matcher import PhraseMatcher
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -13,11 +14,10 @@ def read_text_file(file_path):
 
 def clean_text(text):
     text = re.sub(r'\s+',' ',text)
-    text = text.strip().lower()
     return text
 
 
-def load_skills(skill_file="skills.json"):
+def load_skills(skill_file="data/skills.json"):
     with open(skill_file, "r") as f:
         return json.load(f)
 
@@ -35,18 +35,34 @@ def parse_resume(text):
                 "skills":[],
                 "companies":[],
                 "education":[],
-                "contact_info":[],
+                "contact_info":{},
                 "experience":[]
     }
 
     for ent in doc.ents:
         parsed_resume["entities"][ent.label_].append(ent.text)
+        if ent.label_ == "ORG":
+            parsed_resume["companies"].append(ent.text)
 
 
-    for chunk in doc.noun_chunks:
+    matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
+    patterns = [nlp(skill) for skill in tech_skills if " " in skill]
+    matcher.add("TECH_SKILLS",patterns)
 
-        if any(skill.lower() in chunk.text.lower() for skill in tech_skills):
-            parsed_resume["skills"].append(chunk.text.strip())
+    matches = matcher(doc)
+    for match_id,start,end in matches:
+        span = doc[start:end]
+        parsed_resume["skills"].append(span.text)
+
+
+    for token in doc:
+        lemma = token.lemma_.lower()
+        if lemma in tech_skills and token.pos_ in{"NOUN","PROPN"}:
+            parsed_resume["skills"].append(lemma)
+            
+
+    #to remove the duplicates
+    parsed_resume["skills"] = list(set(parsed_resume["skills"]))
 
 
     education_keywords = ["degree", "university", "college", "bachelor", "master", "phd", "school", "education"]
@@ -84,3 +100,11 @@ def save_to_json(data,output_file="output.json"):
     with open(output_file,'w') as f:
         json.dump(data,f,indent=2)
 
+
+resume_text = read_text_file("data/resumes/resume_01.txt")
+cleaned_text = clean_text(resume_text)
+parsed = parse_resume(cleaned_text)
+
+print("Companies found:")
+for company in parsed["companies"]:
+    print("-", company)

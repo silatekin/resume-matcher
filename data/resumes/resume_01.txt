@@ -9,16 +9,16 @@ Full-stack developer with 5+ years of experience in JavaScript, React, and Node.
 
 Experience:
 
-    Senior Software Engineer, TechCorp (2021–Present)
+    Senior Software Engineer, Google (2021–Present)
 
         Led a team to build a customer dashboard using React and Redux.
 
         Improved API response time by 30% by optimizing backend queries.
 
-    Software Developer, WebSolutions (2018–2021)
+    Software Developer, Pinterest (2018–2021)
 
         Developed RESTful APIs using Node.js and Express.
 
 Skills: JavaScript, React, Node.js, Python, SQL
 
-Education: B.S. in Computer Science, University of XYZ (2018)
+Education: B.S. in Computer Science, Stanford University (2018)
