@@ -1,31 +1,26 @@
-Software Engineer (Full-Stack)
+John Doe
+john.doe@email.com | (123) 456-7890 | linkedin.com/in/johndoe
 
-Company: TechNova Inc.
-Location: Remote
-Job Type: Full-time
-Salary Range: 110,000–110,000–150,000
+Summary
+Highly motivated Software Engineer with 5+ years of experience in full-stack development, specializing in Python and JavaScript frameworks. Proven ability to lead projects and deliver high-quality software solutions.
 
-Job Description:
-We’re seeking a Full-Stack Engineer to build scalable web applications. You’ll work with React, Node.js, and AWS to deliver high-performance features.
+Experience
+Senior Software Engineer | Tech Solutions Inc. | Jan 2020 - Present
+- Led development of a new customer portal using React and Node.js.
+- Mentored junior engineers and conducted code reviews.
+- Improved application performance by 20% through database optimization (SQL).
 
-Responsibilities:
+Software Engineer | Web Innovators LLC | Jun 2017 - Dec 2019
+- Developed and maintained web applications using Python (Django) and JavaScript.
+- Collaborated with product managers in an Agile/Scrum environment.
+- Contributed to REST API design and implementation.
 
-    Develop and maintain frontend (React) and backend (Node.js) services.
+Skills
+Programming Languages: Python, Java, JavaScript, SQL
+Frameworks: React, Node.js, Django, Spring Boot
+Tools: Git, Docker, AWS, Jenkins
+Methodologies: Agile, Scrum, Project Management
 
-    Optimize APIs for speed and scalability.
-
-    Collaborate with product managers on feature design.
-
-Requirements:
-
-    3+ years of experience with JavaScript/TypeScript.
-
-    Proficiency in RESTful APIs and databases (SQL/NoSQL).
-
-    Familiarity with AWS (Lambda, S3) is a plus.
-
-Nice-to-Have:
-
-    Experience with Docker/Kubernetes.
-
-    Contributions to open-source projects.
+Education
+Master of Science (MSc) in Computer Science | State University | 2015 - 2017
+Bachelor of Science (BSc) in Software Engineering | Tech College | 2011 - 2015
