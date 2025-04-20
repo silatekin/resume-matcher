@@ -2,3 +2,5 @@ venv/
 __pycache__/
 *.pyc
 .env
+parsed_resume_output.json
+.vscode/
