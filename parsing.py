@@ -95,7 +95,7 @@ def segment_resume(text):
                 sections[current_section_key] = "\n".join(current_section_content).strip()
             
             current_section_key = matched_key
-            current_section_content = []
+            current_section_content = [line]
         
         else: 
             if line.strip(): 
