@@ -174,11 +174,11 @@ def get_education_level(text):
         return highest_level
     
     text_lower = text.lower()
+    text_lower = re.sub(r'\b([a-z])\.', r'\1', text_lower)
 
     for keyword,level in EDUCATION_LEVELS.items():
         pattern = r'\b' + re.escape(keyword) + r'\b'
         if re.search(pattern, text_lower):
-            # If found, update highest_level to be the max of current and new level
             highest_level = max(highest_level, level)
 
     logging.info(f"Determined highest education level found in text: {highest_level}")
@@ -241,7 +241,9 @@ def parse_resume_sections(sections):
             institution_mention = None
             date_mention = None
 
-            sent_lower = sent.text.lower()
+            sent_original_text = sent.text.strip() 
+            sent_lower = sent_original_text.lower()
+            sent_lower = re.sub(r'\b([a-z])\.', r'\1', sent_lower) 
 
             for keyword,level in EDUCATION_LEVELS.items():
                 pattern = r'\b' + re.escape(keyword) + r'\b'
