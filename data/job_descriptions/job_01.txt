@@ -1,26 +1,20 @@
-John Doe
-john.doe@email.com | (123) 456-7890 | linkedin.com/in/johndoe
+Job Title: Software Engineer
+Location: San Francisco, CA
 
-Summary
-Highly motivated Software Engineer with 5+ years of experience in full-stack development, specializing in Python and JavaScript frameworks. Proven ability to lead projects and deliver high-quality software solutions.
+Responsibilities:
+- Design cool stuff
+- Write code
 
-Experience
-Senior Software Engineer | Tech Solutions Inc. | Jan 2020 - Present
-- Led development of a new customer portal using React and Node.js.
-- Mentored junior engineers and conducted code reviews.
-- Improved application performance by 20% through database optimization (SQL).
+Minimum Qualifications:
+- BS in Computer Science
+- 3+ years experience with Python
 
-Software Engineer | Web Innovators LLC | Jun 2017 - Dec 2019
-- Developed and maintained web applications using Python (Django) and JavaScript.
-- Collaborated with product managers in an Agile/Scrum environment.
-- Contributed to REST API design and implementation.
+Preferred Qualifications:
+- MS degree
+- Experience with Cloud tech
 
-Skills
-Programming Languages: Python, Java, JavaScript, SQL
-Frameworks: React, Node.js, Django, Spring Boot
-Tools: Git, Docker, AWS, Jenkins
-Methodologies: Agile, Scrum, Project Management
+Location:
+- Hybrid
 
-Education
-Master of Science (MSc) in Computer Science | State University | 2015 - 2017
-Bachelor of Science (BSc) in Software Engineering | Tech College | 2011 - 2015
+Skills:
+Python, Java, SQL

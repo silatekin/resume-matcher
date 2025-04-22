@@ -41,7 +41,6 @@ def load_skills(skill_file="data/skills.json"):
             valid_skills = [str(skill).lower()
                             for skill in skills_data 
                             if isinstance(skill,str)]
-
             logging.info(f"Loaded {len(valid_skills)} skills from {skill_file}")
             return valid_skills
     except FileNotFoundError:
@@ -164,7 +163,7 @@ EDUCATION_LEVELS = {
     "master": 4, "masters": 4, "msc": 4, "mba": 4, "meng": 4, "ma": 4, "ms": 4,
     "bachelor": 3, "bachelors": 3, "bsc": 3, "beng": 3, "ba": 3, "bs": 3,
     "associate": 2, "associates": 2,
-    "college": 1, # Ambiguous, rank low
+    "college": 1, 
     "high school": 0, "ged": 0
 }
 
@@ -208,7 +207,7 @@ def parse_resume_sections(sections):
         matcher.add("TECH_SKILLS",patterns)
         matches = matcher(skills_doc)
 
-        matched_indices = set() # store token indices
+        matched_indices = set() 
         for match_id,start,end in matches:
             span = skills_doc[start:end] 
             found_skills.add(span.text.strip())
@@ -288,7 +287,6 @@ def parse_resume_sections(sections):
             print(f"\n--- Processing Experience Sentence ---")
             print(f"SENTENCE: '{sent_text}'")
 
-            # we will look for the DATE RANGES first
             date_range_pattern =  r"(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4})\s*(?:-|–|to|until)\s*(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4}|Present|Current|Now)\b"
 
             date_match = re.search(date_range_pattern,sent_text,re.IGNORECASE)
@@ -319,16 +317,12 @@ def parse_resume_sections(sections):
                             company_start_index = sent_text.find(company_name)
                             # Check if company name was found and isn't at the very beginning
                             if company_start_index != -1: #it returns -1 if not found
-                            # Extract the text before the company name
                                 text_before_company = sent_text[:company_start_index].strip()
-                            # Remove common trailing separators (like comma or pipe) before the company
                                 text_before_company = re.sub(r'[,|]\s*$', '', text_before_company).strip()
-                            # Basic check: Is the remaining text non-empty and seem capitalized?
                                 if text_before_company and text_before_company[0].isupper():
-                                    job_title = text_before_company # Assign this as the guessed job title
-                                    print(f"--> Guessed title from same line: '{job_title}'") # Debug print
+                                    job_title = text_before_company 
+                                    print(f"--> Guessed title from same line: '{job_title}'") 
                         except Exception as e:
-                            # Log if something goes wrong during guessing
                             logging.warning(f"Error guessing title from same line: {e}")    
                     
                     
@@ -361,14 +355,12 @@ def parse_resume_sections(sections):
                     description_from_date_line = ""
 
                     try:
-                        date_end_index = date_match.end() # Get end position of the date range pattern
+                        date_end_index = date_match.end()
                         #Check if there is actually any text *after* the date pattern on this line.
                         # Is the end index of the date match *before* the total length of the line?
                         if date_end_index < len(sent_text):
                             potential_description = sent_text[date_end_index:].strip()
-                            # This regex removes one or more hyphens, closing parentheses, asterisks,
-                            # bullets (•·), or whitespace characters IF they appear right at the START (^)
-                            # of the potential_description we just extracted.
+                            # This regex removes one or more hyphens, closing parentheses, asterisks
                             potential_description = re.sub(r'^[-)*\u2022•·\s]+', '', potential_description).strip()
                             if potential_description:
                                 description_from_date_line = potential_description
@@ -396,9 +388,6 @@ def parse_resume_sections(sections):
                     for ent in nlp(sent_text).ents:
                         if ent.label_ == "ORG":
                             extracted_companies.add(ent.text.strip())
-                            # If we are building a role that's missing a company, maybe fill it?
-                            #if current_role and not current_role.get("company"):
-                            #    current_role["company"] = ent.text
                             is_potential_title = False
                             break
 
@@ -409,13 +398,12 @@ def parse_resume_sections(sections):
                 print(f"IS POTENTIAL TITLE GUESS: {is_potential_title}")
 
                 if not is_potential_title and current_role:
-                    print(f"APPENDING TO DESCRIPTION for role: {current_role.get('job_title') or current_role.get('company')}") # See what's being appended
-                    # This is your existing append logic, ensure the key is "description" (no colon)
+                    print(f"APPENDING TO DESCRIPTION for role: {current_role.get('job_title') or current_role.get('company')}") 
                     current_role["description"] = (current_role.get("description", "") + "\n" + sent_text).strip()
-                    print(f"  New Description: '{current_role['description'][:50]}...'") # Print part of the updated description
+                    print(f"  New Description: '{current_role['description'][:50]}...'")
 
                 elif is_potential_title:
-                    print(f"ADDING TO POTENTIAL TITLE LINES: '{sent_text}'") # See if it's treated as a title line
+                    print(f"ADDING TO POTENTIAL TITLE LINES: '{sent_text}'") 
                 elif not current_role:
                     print("SKIPPING (No current role established yet)")
 
@@ -440,7 +428,7 @@ def parse_resume_sections(sections):
 
 
     text_for_contacts = sections.get("header", "")
-    if not text_for_contacts: # Fallback to combined text
+    if not text_for_contacts: 
          text_for_contacts = "\n".join(sections.values())
 
     email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
@@ -455,9 +443,9 @@ def parse_resume_sections(sections):
     phones_found = []
     # Use finditer to get match objects
     for match in re.finditer(phone_pattern, text_for_contacts):
-        full_match = match.group(0) # Get the whole matched string
-        cleaned_phone = re.sub(r'[-.\s()]', '', full_match) # Clean it
-        if cleaned_phone: # Avoid adding empty strings if cleaning fails unexpectedly
+        full_match = match.group(0) 
+        cleaned_phone = re.sub(r'[-.\s()]', '', full_match) 
+        if cleaned_phone: 
             phones_found.append(cleaned_phone)
     
     if phones_found:
@@ -465,14 +453,12 @@ def parse_resume_sections(sections):
         logging.info(f"Found phones: {parsed_resume['contact_info']['phones']}")
 
 
-    # --- Final Cleanup ---
     # Deduplicate companies extracted from experience
     parsed_resume["companies"] = sorted(list(extracted_companies))
 
     return parsed_resume
         
       
-# --- Function to Save JSON ---
 def save_to_json(data, output_file="output.json"):
     """Saves data to a JSON file."""
     try:
@@ -489,7 +475,6 @@ if __name__ == "__main__":
     skill_list_path = "data/skills.json"
 
     import os
-    # --- Ensure skills file exists FIRST ---
     if not os.path.exists(skill_list_path):
         logging.warning(f"Skill file '{skill_list_path}' not found. Creating basic example.")
         example_skills = ["python", "java", "sql", "javascript", "react", "angular", "node.js",
@@ -503,18 +488,12 @@ if __name__ == "__main__":
         except Exception as e:
             logging.error(f"Could not create example skill file: {e}")
 
-    # --- NOW load skills ---
-    tech_skills = load_skills(skill_list_path) # Reload skills AFTER potential creation
+ 
+    tech_skills = load_skills(skill_list_path) 
     tech_skills_set = set(tech_skills)
     if not tech_skills:
          logging.error("Failed to load skills even after check/creation. Exiting.")
-         exit() # Or handle appropriately
-
-    # --- Ensure resume file exists ---
-    # (Your existing code for creating example resume)
-    if not os.path.exists(resume_file_path):
-         # ... (rest of your example resume creation code) ...
-         pass # Make sure this block doesn't overwrite your actual resume_01.txt if it exists
+         exit() 
 
     # --- Run the Parsing Pipeline ---
     logging.info("Starting resume parsing process...")
@@ -523,12 +502,11 @@ if __name__ == "__main__":
     if resume_text:
         cleaned_text = clean_text(resume_text)
         sections = segment_resume(cleaned_text)
-        # --->>> ADD PRINT HERE <<<---
         print("--- SEGMENTED SECTIONS ---")
         print(sections)
         print("-" * 25)
 
-        parsed_data = parse_resume_sections(sections) # Pass the loaded nlp object if needed
+        parsed_data = parse_resume_sections(sections) 
 
         print("\n--- Parsed Resume Data ---")
         print(json.dumps(parsed_data, indent=4, default=str))
