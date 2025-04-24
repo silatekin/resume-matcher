@@ -1,20 +1,33 @@
-Job Title: Software Engineer
-Location: San Francisco, CA
+Job Title: Senior Python Developer
+Company: Tech Innovations Ltd.
+Location: Remote (Based in Antalya, TR preferred)
 
-Responsibilities:
-- Design cool stuff
-- Write code
+About Us:
+We are a leading tech company focused on AI solutions.
+Our team is growing fast!
 
-Minimum Qualifications:
-- BS in Computer Science
-- 3+ years experience with Python
+RESPONSIBILITIES:
+- Design, develop, and maintain scalable Python applications.
+- Collaborate with product managers and other engineers.
+- Write unit tests and documentation.
+- Mentor junior developers.
 
-Preferred Qualifications:
-- MS degree
-- Experience with Cloud tech
+Minimum Qualifications
+* BSc in Computer Science or equivalent practical experience.
+* 5+ years of software development experience.
+* 3+ years of experience with Python.
+* Experience with Django or Flask frameworks.
 
-Location:
-- Hybrid
+Nice to have:
+* Experience with cloud platforms (AWS, Azure, GCP).
+* Knowledge of Docker and Kubernetes.
+* Familiarity with CI/CD pipelines.
 
-Skills:
-Python, Java, SQL
+SKILLS:
+Python, Django, Flask, SQL, Git, Docker, AWS
+
+Education Requirements:
+Bachelor's degree minimum. Master's preferred.
+
+Compensation:
+Competitive salary plus bonus and stock options. Benefits package included.

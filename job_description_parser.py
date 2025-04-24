@@ -61,12 +61,12 @@ tech_skills_set = set(tech_skills)
 SECTION_HEADERS = {
     "responsibilities": r"(?i)^\s*(responsibilities|what\s*you['’]?ll\s*do|duties|the\s*role|job\s*responsibilities|key\s*responsibilities|day-to-day|your\s*impact)\s*[:]?\s*$",
     "qualifications": r"(?i)^\s*(qualifications|requirements|minimum\s*qualifications|basic\s*qualifications|required\s*skills|what\s*we['’]?re\s*looking\s*for|who\s*you\s*are|ideal\s*candidate|your\s*profile)\s*[:]?\s*$",
-    "preferred": r"(?i)^\s*(preferred\s*qualifications|nice\s*to\s*have|bonus\s*points|desired\s*skills|additional\s*qualifications)\s*[:]?\s*$",
+    "preferred": r"(?i)^\s*(preferred\s*qualifications|Nice-to-Have|bonus\s*points|desired\s*skills|additional\s*qualifications)\s*[:]?\s*",
     "skills": r"(?i)^\s*(skills|technical\s*skills|technical\s*proficiency|tools|technologies)\s*[:]?\s*$",
     "experience": r"(?i)^\s*(experience|work\s*experience|professional\s*experience|employment\s*history|required\s*experience)\s*[:]?\s*$",
     "education": r"(?i)^\s*(education|academic\s*background|educational\s*requirements|education\s*requirements)\s*[:]?\s*$",
     "about": r"(?i)^\s*(about\s*us|about\s*the\s*company|who\s*we\s*are)\s*[:]?\s*$", 
-    "location": r"(?i)^\s*(location|where\s*you['’]?ll\s*work)\s*[:]?\s*$",
+    "location": r"(?i)^\s*(location|where\s*you['’]?ll\s*work)\s*[:]?\s*",
     "compensation": r"(?i)^\s*(compensation|salary|pay|benefits|perks)\s*[:]?\s*$",
 }
 
@@ -109,11 +109,15 @@ def segment_jd(text):
         else:
             if line.strip():
                 current_section_content.append(line)
+    
 
+    if current_section_content: 
+        sections[current_section_key] = "\n".join(current_section_content).strip()
 
     sections = {k: v for k, v in sections.items() if v}
     logging.info(f"Segmented resume into sections: {list(sections.keys())}")
     return sections 
+
 
 def parse_jd_sections(sections):
     parsed_jd = {
@@ -131,7 +135,7 @@ def parse_jd_sections(sections):
     }
 
     # ---Parsing logic---
-    # 1. Process sections.get('header', '') to extract job title, company, location
+    # Extract job title, company, location
     if "header" in sections:
         header_text = sections.get("header","")
         if header_text:
@@ -152,22 +156,41 @@ def parse_jd_sections(sections):
                     logging.info("Found potential location in header: {ent.text}")
                     break
 
-            # This likely needs pattern matching on header_text or header_doc.sents[0]?
-            # Example placeholder: Find capitalized words at start?
-            first_line = header_text.splitlines()[0] if '\n' in header_text else header_text
-            # Very basic title guess (needs improvement):
-            if parsed_jd["job_title"] is None and first_line.istitle():
-                if first_line.strip() != parsed_jd["company_name"]:
-                    parsed_jd["job_title"] = first_line.strip()
-                    logging.info(f"Guessed potential job title from first line: {first_line.strip()}")
+            
+            if parsed_jd["job_title"] is None:
+                prefix_pattern = r"(?i)^\s*(job\s*title|position|role)\s*[:]?\s*"
 
-        # To refine location
+                header_lines = header_text.splitlines()
+                for i, line in enumerate(header_lines):
+                    cleaned_title = line.strip()
+
+                    title_without_prefix = re.sub(prefix_pattern,"",cleaned_title)
+
+                    if title_without_prefix != cleaned_title or (i==0 and title_without_prefix):
+                        if title_without_prefix and title_without_prefix != parsed_jd["company_name"]:
+                            parsed_jd["job_title"] = title_without_prefix
+                            logging.info(f"Extracted job title: {title_without_prefix}")
+                            break
+
+    # To refine location
     if "location" in sections:
         location_text = sections.get("location","").strip()
-        location_text_cleaned = re.sub(r"(?i)^\s*location\s*[:]?\s*", "", location_text).strip()
-        if location_text_cleaned:
-            logging.info(f"Overriding/setting location from dedicated section: {location_text_cleaned}")
-            parsed_jd["location"] = location_text_cleaned 
+        location_text_cleaned_block = re.sub(r"(?i)^\s*location\s*[:]?\s*", "", location_text).strip()
+
+        if location_text_cleaned_block:
+            location_lines = location_text_cleaned_block.splitlines()
+            if location_lines:
+                first_line = location_lines[0].strip()
+
+                if first_line:
+                    logging.info(f"Overriding/setting location from dedicated section: {first_line}")
+                    parsed_jd["location"] = first_line
+                else:
+                    logging.info("Location section found, but first line empty after cleaning.")
+            else:
+                 logging.info("Location section found, but text empty after splitting lines.")
+
+        
 
     # 3. Process sections.get('responsibilities', '') - split by lines/bullets
     if "responsibilities" in sections:
@@ -197,7 +220,7 @@ def parse_jd_sections(sections):
             logging.info("Responsibility section found but text is empty.")
 
             
-    # 4. Process sections.get('qualifications', '') - extract text, maybe look for experience patterns?
+    # 4. Process sections.get('qualifications', '') - maybe look for experience patterns?
     if "qualifications" in sections:
         qualifications_text = sections.get("qualifications", "")
 
@@ -347,8 +370,9 @@ def parse_jd_sections(sections):
         about_text = sections.get("about", "") 
 
         if about_text:
-            header_pattern = SECTION_HEADERS["about"]
-            cleaned_about_text = re.sub(header_pattern, "", about_text, count=1).strip() 
+            header_pattern_string = SECTION_HEADERS["about"]
+            removal_pattern = header_pattern_string.rstrip('$') + r'\n?'
+            cleaned_about_text = re.sub(removal_pattern, "", about_text, count=1).strip() 
 
             if cleaned_about_text:
                parsed_jd["about"] = cleaned_about_text
@@ -400,65 +424,31 @@ def parse_jd_sections(sections):
 # ==================================================
 if __name__ == "__main__":
 
-    logging.info("Starting JD Segmentation Test...")
+    logging.info("Starting JD Parsing Test...") 
 
-    example_jd_text = """
-Job Title: Senior Python Developer
-Company: Tech Innovations Ltd.
-Location: Remote (Based in Antalya, TR preferred)
+    file_path = "data/job_descriptions/job_02.txt"
 
-About Us:
-We are a leading tech company focused on AI solutions.
-Our team is growing fast!
+    example_jd_text = read_text_file(file_path)
 
-RESPONSIBILITIES:
-- Design, develop, and maintain scalable Python applications.
-- Collaborate with product managers and other engineers.
-- Write unit tests and documentation.
-- Mentor junior developers.
+    if example_jd_text: 
+        cleaned_jd_text = clean_text(example_jd_text)
 
-Minimum Qualifications
-* BSc in Computer Science or equivalent practical experience.
-* 5+ years of software development experience.
-* 3+ years of experience with Python.
-* Experience with Django or Flask frameworks.
+        # --- Run the segmentation function ---
+        if cleaned_jd_text: # 
+            print("\n--- Running Segmentation ---")
+            segmented_data = segment_jd(cleaned_jd_text) 
+            print("\n--- Segmentation Complete ---")
 
-Nice to have:
-* Experience with cloud platforms (AWS, Azure, GCP).
-* Knowledge of Docker and Kubernetes.
-* Familiarity with CI/CD pipelines.
+            print("\n--- Running Extraction ---")
+            extracted_data = parse_jd_sections(segmented_data) 
+            print("\n--- Extraction Complete ---") 
 
-SKILLS:
-Python, Django, Flask, SQL, Git, Docker, AWS
+            print("\n--- Extracted Job Description Data ---") 
+            pprint.pprint(extracted_data) 
 
-Education Requirements:
-Bachelor's degree minimum. Master's preferred.
+        else:
+            logging.error(f"Cleaned JD text from {file_path} is empty, cannot parse.")
 
-Compensation:
-Competitive salary plus bonus and stock options. Benefits package included.
+    logging.info("JD Parsing Test Finished.")
 
-"""
-
-    # --- Clean the sample text ---
-    cleaned_jd_text = clean_text(example_jd_text)
-
-     # --- Run the segmentation function ---
-    if cleaned_jd_text:
-        print("\n--- Running Segmentation ---")
-        segmented_data = segment_jd(cleaned_jd_text) 
-        print("\n--- Segmentation Complete ---")
-        # Optional: Print segmented data for debugging if needed
-        # print("\n--- Intermediate Segmented Data ---")
-        # pprint.pprint(segmented_data) 
-
-        print("\n--- Running Extraction ---")
-        extracted_data = parse_jd_sections(segmented_data) 
-        print("\n--- Extraction Complete ---") 
-
-        print("\n--- Extracted Job Description Data ---") 
-        pprint.pprint(extracted_data) 
-
-    else:
-        logging.error("Cleaned JD text is empty, cannot parse.") 
-
-    logging.info("JD Parsing Test Finished.") 
+   
