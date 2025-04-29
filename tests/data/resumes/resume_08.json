@@ -1,0 +1,43 @@
+{
+    "skills": [
+        "CRM"
+    ],
+    "education_details": [
+        {
+            "degree_mention": "ba",
+            "institution_mention": "State College (2018",
+            "date_mention": null,
+            "text": "Education: B.A. in Business, State College (2018)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "olivia.green@email.com"
+        ],
+        "phones": [
+            "5556789012"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Experience",
+            "company": "Sales Rep",
+            "start_date": "2020-01-01",
+            "end_date": "2025-04-29",
+            "description": ""
+        },
+        {
+            "job_title": "Closed $500K in annual deals.",
+            "company": null,
+            "start_date": "2018-01-01",
+            "end_date": "2020-01-01",
+            "description": ""
+        }
+    ],
+    "total_years_experience": 7.3,
+    "education_level": 3,
+    "raw_entities": {},
+    "companies": [
+        "Sales Rep"
+    ]
+}

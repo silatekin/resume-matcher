@@ -7,8 +7,7 @@ from spacy.matcher import PhraseMatcher
 from dateutil.parser import parse as parse_datetime
 from dateutil.relativedelta import relativedelta
 import logging
-import pprint # For pretty printing the output dictionary
-
+import os
 
 try:
     nlp = spacy.load("en_core_web_md")
@@ -35,7 +34,11 @@ def clean_text(text):
     return text
 
 
-def load_skills(skill_file="data/skills.json"):
+def load_skills(skill_file=None):
+    if skill_file is None:  
+        script_dir = os.path.dirname(os.path.abspath(__file__)) 
+        skill_file = os.path.join(script_dir, 'tests', 'data', 'skills.json') 
+    
     try:
         with open(skill_file,"r",encoding="utf-8") as f:
             skills_data = json.load(f)
@@ -419,6 +422,35 @@ def parse_jd_sections(sections):
     return parsed_jd
 
 
+def parse_jd_file(filepath):
+    """
+    Parses a job description text file and returns a structured dictionary.
+    This acts as the main entry point for parsing a single JD file.
+    """
+    logging.info(f"Starting parsing for JD file: {filepath}")
+    try:
+        raw_text = read_text_file(filepath)
+        if raw_text is None:
+            return None 
+
+        raw_text = clean_text(raw_text) 
+
+        sections = segment_jd(raw_text)
+        if not sections:
+             logging.warning(f"Segmentation returned no sections for {filepath}")
+             return None 
+
+        final_dictionary = parse_jd_sections(sections)
+
+        logging.info(f"Finished parsing JD file: {filepath}")
+        return final_dictionary
+
+    except Exception as e:
+        logging.error(f"An unexpected error occurred parsing JD file {filepath}: {e}", exc_info=True)
+        return None 
+
+
+"""
 # ==================================================
 #  TESTING BLOCK
 # ==================================================
@@ -451,4 +483,5 @@ if __name__ == "__main__":
 
     logging.info("JD Parsing Test Finished.")
 
+    """
    

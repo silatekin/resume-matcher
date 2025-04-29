@@ -1,0 +1,42 @@
+{
+    "skills": [],
+    "education_details": [
+        {
+            "degree_mention": "college",
+            "institution_mention": "BSN",
+            "date_mention": "2016",
+            "text": "BSN, Nursing College (2016)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "emily.carter@email.com"
+        ],
+        "phones": [
+            "5557890123"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Experience",
+            "company": "ICU Nurse",
+            "start_date": "2019-01-01",
+            "end_date": "2025-04-29",
+            "description": "Monitored critically ill patients and assisted in life-saving procedures."
+        },
+        {
+            "job_title": "Staff Nurse",
+            "company": "Community Clinic",
+            "start_date": "2016-01-01",
+            "end_date": "2019-01-01",
+            "description": ""
+        }
+    ],
+    "total_years_experience": 9.3,
+    "education_level": 1,
+    "raw_entities": {},
+    "companies": [
+        "Community Clinic",
+        "ICU Nurse"
+    ]
+}
