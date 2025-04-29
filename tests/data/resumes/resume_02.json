@@ -1,0 +1,45 @@
+{
+    "skills": [
+        "Google Ads",
+        "SEO"
+    ],
+    "education_details": [
+        {
+            "degree_mention": "mba",
+            "institution_mention": "Business University",
+            "date_mention": null,
+            "text": "Education: MBA in Marketing, Business University (2016)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "sarah.williams@email.com"
+        ],
+        "phones": [
+            "5559876543"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Marketing Manager",
+            "company": "Coca Cola",
+            "start_date": "2020-01-01",
+            "end_date": "2025-04-29",
+            "description": "Increased organic traffic by 50% through SEO optimization.\nManaged a $100K/month ad budget on Google and Facebook."
+        },
+        {
+            "job_title": null,
+            "company": "Digital Marketer",
+            "start_date": "2016-01-01",
+            "end_date": "2020-01-01",
+            "description": ""
+        }
+    ],
+    "total_years_experience": 9.3,
+    "education_level": 4,
+    "raw_entities": {},
+    "companies": [
+        "Coca Cola",
+        "Digital Marketer"
+    ]
+}

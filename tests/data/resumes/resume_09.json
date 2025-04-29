@@ -1,0 +1,41 @@
+{
+    "skills": [],
+    "education_details": [
+        {
+            "degree_mention": "ba",
+            "institution_mention": "Human Resources, Business University",
+            "date_mention": null,
+            "text": "Education: B.A. in Human Resources, Business University (2017)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "daniel.park@email.com"
+        ],
+        "phones": [
+            "5558901234"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "HR Specialist",
+            "company": "PeopleFirst",
+            "start_date": "2019-01-01",
+            "end_date": "2025-04-29",
+            "description": ""
+        },
+        {
+            "job_title": "Reduced hiring time",
+            "company": null,
+            "start_date": "2017-01-01",
+            "end_date": "2019-01-01",
+            "description": ""
+        }
+    ],
+    "total_years_experience": 8.3,
+    "education_level": 3,
+    "raw_entities": {},
+    "companies": [
+        "PeopleFirst"
+    ]
+}

@@ -1,0 +1,42 @@
+{
+    "skills": [],
+    "education_details": [
+        {
+            "degree_mention": "bs",
+            "institution_mention": "Mechanical Engineering",
+            "date_mention": null,
+            "text": "Education: B.S. in Mechanical Engineering, Tech University (2018)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "lisa.wong@email.com"
+        ],
+        "phones": [
+            "5559012345"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Mechanical Engineer",
+            "company": "AutoTech",
+            "start_date": "2020-01-01",
+            "end_date": "2025-04-29",
+            "description": "Designed automotive components using SolidWorks."
+        },
+        {
+            "job_title": null,
+            "company": null,
+            "start_date": "2018-01-01",
+            "end_date": "2020-01-01",
+            "description": ""
+        }
+    ],
+    "total_years_experience": 7.3,
+    "education_level": 3,
+    "raw_entities": {},
+    "companies": [
+        "AutoTech",
+        "SolidWorks"
+    ]
+}

@@ -2,11 +2,12 @@ import re
 import spacy
 import json
 from collections import defaultdict
-from datetime import datetime
+import datetime
 from spacy.matcher import PhraseMatcher
 from dateutil.parser import parse as parse_datetime
 from dateutil.relativedelta import relativedelta
 import logging
+import os
 
 try:
     nlp = spacy.load("en_core_web_md")
@@ -33,7 +34,12 @@ def clean_text(text):
     return text
 
 
-def load_skills(skill_file="data/skills.json"):
+def load_skills(skill_file=None):
+
+    if skill_file is None:
+        script_dir = os.path.dirname(os.path.abspath(__file__)) 
+        skill_file = os.path.join(script_dir, 'tests', 'data', 'skills.json') 
+
     try:
         with open(skill_file,"r",encoding="utf-8") as f:
             skills_data = json.load(f)
@@ -62,13 +68,13 @@ SECTION_HEADERS = {
     "experience": r"^\s*(experience|work\s*experience|employment\s*history)\s*[:\n]",
 }
 
-def segment_resume(text):
-    if not text:
+def segment_resume(raw_text):
+    if not raw_text:
         return {}
     
     sections = {"header": ""}
     current_section_key = "header"
-    lines = text.splitlines()
+    lines = raw_text.splitlines()
     compiled_patterns = {}
 
     for key,pattern in SECTION_HEADERS.items():
@@ -116,9 +122,9 @@ def parse_date(date_string):
     date_string = date_string.strip()
 
     if date_string.lower() in ["present","current","now","today","til date"]:
-        return datetime.now()
+        return datetime.datetime.now() 
     try:
-        return parse_datetime(date_string, default=datetime(1,1,1), fuzzy=False)
+        return parse_datetime(date_string, default=datetime.datetime(1, 1, 1), fuzzy=False) 
     except (ValueError, OverflowError):
         pass
 
@@ -135,7 +141,7 @@ def parse_date(date_string):
         if match:
             try:
                 if len(match.groups()) == 1: #only year matched(pattern 1)
-                    return datetime(int(match.group(1)),1,1) #assume Jan 1st
+                    return datetime.datetime(int(match.group(1)), 1, 1) #assume Jan 1st
                 elif len(match.groups()) == 2: #Month/Year MM/YYYY matched
                     month_str = match.group(1)
                     year_str = match.group(2)
@@ -149,7 +155,7 @@ def parse_date(date_string):
                         except ValueError:
                             continue # Invalid month name, try next regex pattern
                     #Construct date assuming 1st day
-                    return datetime(int(year_str), month, 1)
+                    return datetime.datetime(int(year_str), month, 1)
             except (ValueError, OverflowError):
                 # Invalid number (e.g., year 99999, month 15)
                 continue
@@ -457,17 +463,50 @@ def parse_resume_sections(sections):
     parsed_resume["companies"] = sorted(list(extracted_companies))
 
     return parsed_resume
+
+
+def parse_resume_file(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            raw_text = f.read()
+
+        sections = segment_resume(raw_text) 
         
+        final_dictionary = parse_resume_sections(sections)
+
+           
+        if  final_dictionary is None:
+            return None
+
+        if 'experience' in final_dictionary and isinstance(final_dictionary['experience'],list):
+            for job in final_dictionary['experience']:
+                if isinstance(job,dict):
+                    if 'start_date' in job and isinstance(job['start_date'], (datetime.date, datetime.datetime)):
+                        job["start_date"] = job['start_date'].strftime('%Y-%m-%d')
+
+                    if 'end_date' in job and hasattr(job['end_date'], 'isoformat'):
+                        if isinstance(job['end_date'], (datetime.date, datetime.datetime)):
+                            job['end_date'] = job['end_date'].strftime('%Y-%m-%d')
+
+        return final_dictionary
+    
+
+    
+    except Exception as e:
+        print(f"Error parsing resume file {filepath}: {e}")
+        return None 
+        
+
+"""
       
 def save_to_json(data, output_file="output.json"):
-    """Saves data to a JSON file."""
+
     try:
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, default=str)
         logging.info(f"Parsed data successfully saved to {output_file}")
     except Exception as e:
         logging.error(f"Error saving data to JSON file {output_file}: {e}")
-
 
 if __name__ == "__main__":
     resume_file_path = "data/resumes/resume_01.txt"
@@ -516,4 +555,4 @@ if __name__ == "__main__":
         logging.error("Could not read resume file. Exiting.")
 
 
-
+"""

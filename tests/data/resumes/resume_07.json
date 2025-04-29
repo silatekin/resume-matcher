@@ -1,0 +1,41 @@
+{
+    "skills": [],
+    "education_details": [
+        {
+            "degree_mention": "college",
+            "institution_mention": "Elementary Education",
+            "date_mention": null,
+            "text": "Education: M.Ed in Elementary Education, Teachers College (2015)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "michael.brown@email.com"
+        ],
+        "phones": [
+            "5555678901"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Experience",
+            "company": "Sunshine Elementary",
+            "start_date": "2017-01-01",
+            "end_date": "2025-04-29",
+            "description": "Improved reading scores by 20% through personalized learning."
+        },
+        {
+            "job_title": null,
+            "company": null,
+            "start_date": "2015-01-01",
+            "end_date": "2017-01-01",
+            "description": ""
+        }
+    ],
+    "total_years_experience": 10.3,
+    "education_level": 1,
+    "raw_entities": {},
+    "companies": [
+        "Sunshine Elementary"
+    ]
+}

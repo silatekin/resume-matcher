@@ -1,0 +1,46 @@
+{
+    "skills": [
+        "Figma",
+        "Illustrator",
+        "Photoshop"
+    ],
+    "education_details": [
+        {
+            "degree_mention": null,
+            "institution_mention": "Graphic Design",
+            "date_mention": "2016",
+            "text": "Education: BFA in Graphic Design, Art Institute (2016)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "jake.martinez@email.com"
+        ],
+        "phones": [
+            "5552345678"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Experience",
+            "company": null,
+            "start_date": "2018-01-01",
+            "end_date": "2025-04-29",
+            "description": ""
+        },
+        {
+            "job_title": "Junior Designer",
+            "company": "Creative Agency",
+            "start_date": "2016-01-01",
+            "end_date": "2018-01-01",
+            "description": "Assisted in UI/UX projects."
+        }
+    ],
+    "total_years_experience": 9.3,
+    "education_level": -1,
+    "raw_entities": {},
+    "companies": [
+        "Assisted",
+        "Creative Agency"
+    ]
+}

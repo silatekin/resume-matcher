@@ -1,0 +1,43 @@
+{
+    "skills": [],
+    "education_details": [
+        {
+            "degree_mention": "bs",
+            "institution_mention": "Business School",
+            "date_mention": null,
+            "text": "Education: B.S. in Finance, Business School (2019)"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "rachel.lee@email.com"
+        ],
+        "phones": [
+            "5553456789"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Financial Analyst",
+            "company": "Capital Investments",
+            "start_date": "2021-01-01",
+            "end_date": "2025-04-29",
+            "description": ""
+        },
+        {
+            "job_title": "Investment Intern",
+            "company": "WealthBank",
+            "start_date": "2019-01-01",
+            "end_date": "2021-01-01",
+            "description": "Assisted in portfolio management."
+        }
+    ],
+    "total_years_experience": 6.3,
+    "education_level": 3,
+    "raw_entities": {},
+    "companies": [
+        "Assisted",
+        "Capital Investments",
+        "WealthBank"
+    ]
+}
