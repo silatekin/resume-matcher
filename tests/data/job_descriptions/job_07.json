@@ -1,13 +1,21 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Elementary School Teacher",
+    "company_name": "Elementary School Teacher\nCompany: Bright Future Academy",
+    "location": "Seattle, WA",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
+    "responsibilities": [
+        "Develop lesson plans aligned with state standards.",
+        "Maintain classroom discipline and parent communication."
+    ],
+    "qualifications": [
+        "State teaching certification.",
+        "1+ year of classroom experience."
+    ],
+    "preferred_qualifications": [
+        "ESL certification."
+    ],
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 1
 }

@@ -1,13 +1,21 @@
 {
-    "job_title": null,
+    "job_title": "HR Specialist",
     "company_name": null,
-    "location": null,
+    "location": "Denver, CO",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
+    "responsibilities": [
+        "Screen resumes and conduct interviews.",
+        "Resolve workplace conflicts."
+    ],
+    "qualifications": [
+        "3+ years in HR.",
+        "Knowledge of labor laws."
+    ],
+    "preferred_qualifications": [
+        "SHRM-CP certification."
+    ],
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 3
 }

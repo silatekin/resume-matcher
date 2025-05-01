@@ -65,7 +65,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     return results
 
 
-
+"""
 dummy_resume = {'skills': ['Python', 'SQL', 'Data Analysis'], 'total_years_experience': 5}
 dummy_jd = {'skills': ['Python', 'Java', 'SQL', 'Cloud'], 'minimum_years_experience': 3}
 
@@ -77,3 +77,4 @@ print(f"Final Score: {match_results['score']:.2f}")
 print(f"Skill Score: {match_results['skill_details']['score']:.2f}")
 print(f"Experience score: {match_results['experience_details']['score']}")
 print(f"Matching Skills ({match_results['skill_details']['match_count']}/{match_results['skill_details']['required_count']}): {match_results['skill_details']['matching_skills']}")
+"""

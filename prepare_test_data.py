@@ -12,7 +12,7 @@ sys.path.insert(0,project_root)
 
 try:
     from resume_parser import parse_resume_file
-    from job_description_parser import parse_jd_sections
+    from job_description_parser import parse_jd_file
 except ImportError as e:
     print(f"Error importing parser functions: {e}")
     print("ACTION NEEDED: Edit the import statements above in prepare_test_data.py.")
@@ -65,7 +65,7 @@ else:
             txt_filepath = os.path.join(RAW_JD_TXT_DIR, txt_filename)
             print(f"  Processing: {txt_filename}")
             try:
-                parsed_jd_dict = parse_jd_sections(txt_filepath)
+                parsed_jd_dict = parse_jd_file(txt_filepath)
 
                 if parsed_jd_dict and isinstance(parsed_jd_dict,dict):
                     json_filename = os.path.splitext(txt_filename)[0]+'.json'

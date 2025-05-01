@@ -1,13 +1,21 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Mechanical Engineer",
+    "company_name": "Mechanical Engineer\nCompany",
+    "location": "Detroit, MI",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
+    "responsibilities": [
+        "Create 3D models (SolidWorks).",
+        "Test prototypes for safety compliance."
+    ],
+    "qualifications": [
+        "Bachelor’s in Mechanical Engineering.",
+        "2+ years in automotive design."
+    ],
+    "preferred_qualifications": [
+        "FEA experience."
+    ],
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 2
 }

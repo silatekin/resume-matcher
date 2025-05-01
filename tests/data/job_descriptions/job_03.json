@@ -1,13 +1,29 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Data Analyst",
+    "company_name": "DataSphere Analytics",
+    "location": "Chicago, IL",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
-    "skills": [],
+    "responsibilities": [
+        "Build dashboards (Tableau/Power BI) for stakeholders.",
+        "Write complex SQL queries to extract trends.",
+        "Automate reports using Python scripts."
+    ],
+    "qualifications": [
+        "2+ years in data analysis.",
+        "Proficiency in SQL, Python (pandas, NumPy).",
+        "Strong storytelling with data."
+    ],
+    "preferred_qualifications": [
+        "Experience with machine learning basics."
+    ],
+    "skills": [
+        "Python",
+        "SQL",
+        "NumPy",
+        "data analysis",
+        "pandas"
+    ],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 2
 }

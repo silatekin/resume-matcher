@@ -1,13 +1,22 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Graphic Designer",
+    "company_name": "Graphic Designer\nCompany",
+    "location": "Los Angeles, CA (On-site)",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
+    "responsibilities": [
+        "Create logos, social media graphics, and UI mockups.",
+        "Work with clients to refine creative direction."
+    ],
+    "qualifications": [
+        "Portfolio showcasing design skills.",
+        "Expertise in Adobe Creative Suite.",
+        "3+ years of professional design experience."
+    ],
+    "preferred_qualifications": [
+        "Motion graphics (After Effects) skills."
+    ],
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 3
 }

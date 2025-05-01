@@ -1,13 +1,24 @@
 {
-    "job_title": null,
+    "job_title": "Sales Representative (B2B)",
     "company_name": null,
-    "location": null,
+    "location": "Remote (USA)",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
-    "skills": [],
+    "responsibilities": [
+        "Prospect leads via LinkedIn and cold calls.",
+        "Close deals (50K–50K–500K ACV)."
+    ],
+    "qualifications": [
+        "2+ years in B2B tech sales.",
+        "Familiarity with CRM tools (Salesforce)."
+    ],
+    "preferred_qualifications": [
+        "Startup experience."
+    ],
+    "skills": [
+        "Salesforce",
+        "CRM"
+    ],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 2
 }

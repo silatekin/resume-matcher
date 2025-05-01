@@ -1,13 +1,23 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Registered Nurse (ICU)",
+    "company_name": "City General Hospital",
+    "location": "Austin, TX",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
+    "responsibilities": [
+        "Monitor vital signs and administer medications.",
+        "Collaborate with doctors on treatment plans.",
+        "Educate patients and families on post-care."
+    ],
+    "qualifications": [
+        "Active RN license in Texas.",
+        "2+ years of ICU experience.",
+        "BLS/ACLS certification."
+    ],
+    "preferred_qualifications": [
+        "CCRN certification."
+    ],
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 2
 }

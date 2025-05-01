@@ -1,13 +1,43 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
-    "about": null,
-    "responsibilities": [],
-    "qualifications": [],
+    "job_title": "Senior Python Developer",
+    "company_name": "Tech Innovations Ltd.",
+    "location": "Remote (Based in Antalya, TR preferred)",
+    "about": "We are a leading tech company focused on AI solutions.\nOur team is growing fast!",
+    "responsibilities": [
+        "Design, develop, and maintain scalable Python applications.",
+        "Collaborate with product managers and other engineers.",
+        "Write unit tests and documentation.",
+        "Mentor junior developers."
+    ],
+    "qualifications": [
+        "BSc in Computer Science or equivalent practical experience.",
+        "5+ years of software development experience.",
+        "3+ years of experience with Python.",
+        "Experience with Django or Flask frameworks.",
+        "Nice to have:",
+        "Experience with cloud platforms (AWS, Azure, GCP).",
+        "Knowledge of Docker and Kubernetes.",
+        "Familiarity with CI/CD pipelines."
+    ],
     "preferred_qualifications": [],
-    "skills": [],
-    "education": [],
-    "compensation": [],
-    "minimum_years_experience": null
+    "skills": [
+        "SQL",
+        "Docker",
+        "Flask",
+        "AWS",
+        "Azure",
+        "CI/CD",
+        "Python",
+        "Git",
+        "GCP",
+        "Kubernetes",
+        "Django"
+    ],
+    "education": [
+        "Bachelor's degree minimum. Master's preferred."
+    ],
+    "compensation": [
+        "Competitive salary plus bonus and stock options. Benefits package included."
+    ],
+    "minimum_years_experience": 5
 }

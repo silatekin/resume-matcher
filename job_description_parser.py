@@ -7,6 +7,7 @@ from spacy.matcher import PhraseMatcher
 from dateutil.parser import parse as parse_datetime
 from dateutil.relativedelta import relativedelta
 import logging
+import pprint
 import os
 
 try:
@@ -449,8 +450,8 @@ def parse_jd_file(filepath):
         logging.error(f"An unexpected error occurred parsing JD file {filepath}: {e}", exc_info=True)
         return None 
 
-
 """
+
 # ==================================================
 #  TESTING BLOCK
 # ==================================================
@@ -458,7 +459,7 @@ if __name__ == "__main__":
 
     logging.info("Starting JD Parsing Test...") 
 
-    file_path = "data/job_descriptions/job_02.txt"
+    file_path = "tests/data/raw_jds/job_01.txt"
 
     example_jd_text = read_text_file(file_path)
 
@@ -483,5 +484,5 @@ if __name__ == "__main__":
 
     logging.info("JD Parsing Test Finished.")
 
-    """
-   
+    
+"""
