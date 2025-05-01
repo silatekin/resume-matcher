@@ -1,13 +1,28 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Digital Marketing Manager",
+    "company_name": "Digital Marketing",
+    "location": "New York, NY (Hybrid)",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
-    "skills": [],
+    "responsibilities": [
+        "Manage Google/Facebook ad budgets ($50K+/month).",
+        "Improve SEO rankings through content and technical optimizations.",
+        "Analyze KPIs and adjust strategies for ROI."
+    ],
+    "qualifications": [
+        "5+ years in digital marketing.",
+        "Expertise in Google Analytics, Ads, and Meta Business Suite.",
+        "Strong copywriting and data analysis skills."
+    ],
+    "preferred_qualifications": [
+        "HubSpot or Salesforce CRM experience."
+    ],
+    "skills": [
+        "Google Analytics",
+        "copywriting",
+        "digital marketing",
+        "data analysis"
+    ],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 5
 }

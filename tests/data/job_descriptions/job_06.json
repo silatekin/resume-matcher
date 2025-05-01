@@ -1,13 +1,22 @@
 {
-    "job_title": null,
-    "company_name": null,
-    "location": null,
+    "job_title": "Financial Analyst",
+    "company_name": "Summit Capital",
+    "location": "Boston, MA",
     "about": null,
-    "responsibilities": [],
-    "qualifications": [],
-    "preferred_qualifications": [],
+    "responsibilities": [
+        "Build DCF and comparables models.",
+        "Prepare reports for senior leadership."
+    ],
+    "qualifications": [
+        "Bachelor’s in Finance or related field.",
+        "Advanced Excel skills.",
+        "2+ years in investment banking or FP&A."
+    ],
+    "preferred_qualifications": [
+        "CFA Level 1 or progress."
+    ],
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": null
+    "minimum_years_experience": 2
 }
