@@ -74,6 +74,14 @@ SECTION_HEADERS = {
     "compensation": r"(?i)^\s*(compensation|salary|pay|benefits|perks)\s*[:]?\s*$",
 }
 
+EDUCATION_LEVELS = {
+    "phd": 5, "doctorate": 5,
+    "master": 4, "masters": 4, "msc": 4, "mba": 4, "meng": 4, "ma": 4, "ms": 4,
+    "bachelor": 3, "bachelors": 3, "bsc": 3, "beng": 3, "ba": 3, "bs": 3,
+    "associate": 2, "associates": 2,
+    "college": 1, 
+    "high school": 0, "ged": 0
+}
 
 def segment_jd(text):
     if not text:
@@ -302,7 +310,7 @@ def parse_jd_sections(sections):
             else:
                 logging.info("Preferred qualifications section found, but no points extracted after cleaning.")
 
-    # 6. Process sections.get('skills',)
+    # 6. Process sections.get('skills')
     if "skills" in sections or "qualifications" in sections:
         skill_sources_keys = ["skills", "qualifications"]
         text_pieces = [sections.get(key, "") for key in skill_sources_keys]
@@ -368,8 +376,25 @@ def parse_jd_sections(sections):
 
         else:
             logging.info("Education section found but text is empty.")
+        
+        logging.info("--- Determining Required Education Level ---")        
+        highest_level_found = -1
+        text_to_search = (sections.get('education', '') + "\n" + sections.get('qualifications', '')).lower()
 
-    # 8. Process sections.get('about', '')
+        if text_to_search.strip():
+            # Iterate through keywords from highest level (5) down to lowest (0)
+            for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1], reverse=True):
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                if re.search(pattern, text_to_search):
+                    highest_level_found = level
+                    logging.info(f"Found highest level mention: {keyword} (Level {level})")
+                    break 
+
+        parsed_jd['required_education_level'] = highest_level_found if highest_level_found != -1 else None 
+        logging.info(f"Assigned highest education level mentioned: {parsed_jd['required_education_level']}")
+     
+
+    # 8. Process sections.get('about')
     if "about" in sections:
         about_text = sections.get("about", "") 
 

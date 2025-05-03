@@ -21,17 +21,17 @@
     ],
     "preferred_qualifications": [],
     "skills": [
-        "SQL",
+        "CI/CD",
+        "Git",
+        "Django",
         "Docker",
-        "Flask",
         "AWS",
         "Azure",
-        "CI/CD",
-        "Python",
-        "Git",
+        "SQL",
         "GCP",
+        "Flask",
         "Kubernetes",
-        "Django"
+        "Python"
     ],
     "education": [
         "Bachelor's degree minimum. Master's preferred."
@@ -39,5 +39,6 @@
     "compensation": [
         "Competitive salary plus bonus and stock options. Benefits package included."
     ],
-    "minimum_years_experience": 5
+    "minimum_years_experience": 5,
+    "required_education_level": 4
 }

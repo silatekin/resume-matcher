@@ -17,11 +17,11 @@
         "Experience with machine learning basics."
     ],
     "skills": [
-        "Python",
         "SQL",
         "NumPy",
+        "pandas",
         "data analysis",
-        "pandas"
+        "Python"
     ],
     "education": [],
     "compensation": [],
