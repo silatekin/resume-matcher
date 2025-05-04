@@ -1,14 +1,11 @@
 import math
+import logging
 
 #TODO
-#Test and Refine: Try different dummy resumes/JDs to see if the scores make sense.
-#Adjust the skill_weight and experience_weight.
-#Add Education Matching:
 #Add Job Title Matching:
 #Add Keyword Matching:
 
 def calculate_match_score(parsed_resume,parsed_jd):
-
 
     skill_score = 0.0
     final_score = 0.0
@@ -22,28 +19,54 @@ def calculate_match_score(parsed_resume,parsed_jd):
 
     matching_skills_set = resume_skills_set.intersection(jd_skills_set)
 
+    
+    if(len(jd_skills_set)) > 0:
+        skill_score=len(matching_skills_set)/len(jd_skills_set)
+    else:
+        skill_score = 1.0 #if jd lists have no skills
+
     #---Experience Years Matching Logic---
     resume_experience_years = parsed_resume.get('total_years_experience',0)
     jd_experience_years = parsed_jd.get('minimum_years_experience',None)
     experience_score = 0.0
 
+    
     if jd_experience_years is None:
         experience_score = 1.0
     elif resume_experience_years>=jd_experience_years:
         experience_score = 1.0
     else:
         experience_score = 0.0
-   
-    #We will calculate score matching skills/total required skills 
-    if(len(jd_skills_set)) > 0:
-        skill_score=len(matching_skills_set)/len(jd_skills_set)
+
+    # ---Education Matching---
+    resume_edu_level = parsed_resume.get('education_level',-1)
+    jd_edu_level = parsed_jd.get('required_education_level',None)
+
+    education_score = 0.0
+
+    if jd_edu_level is None or jd_edu_level < 0:
+        education_score = 1.0
+        logging.info("JD requires no specific education level or requirement is invalid.")
+    
+    elif resume_edu_level < 0:
+        education_score = 0.0
+        logging.info("Resume education level unknown, cannot meet requirement.")
+
+    elif resume_edu_level >= jd_edu_level:
+        education_score = 1.0
+        logging.info(f"Resume level ({resume_edu_level}) meets/exceeds requirement ({jd_edu_level}).")
+
     else:
-        skill_score = 1.0 #if jd lists have no skills
+        education_score = 0.0
+        logging.info(f"Resume level ({resume_edu_level}) is below requirement ({jd_edu_level}).")
+
+
 
     #---Final Score Logic---
-    skill_weight = 0.7
+    skill_weight = 0.5
     experience_weight = 0.3
-    final_score = (skill_score * skill_weight) + (experience_score * experience_weight)
+    education_weight = 0.2
+    final_score = (skill_score * skill_weight) + (experience_score * experience_weight) + (education_score * education_weight)
     
     results = {
         'score':final_score,
@@ -59,6 +82,11 @@ def calculate_match_score(parsed_resume,parsed_jd):
             'score':experience_score,
             'resume_years':resume_experience_years,
             'required_years':jd_experience_years
+        },
+        'education_details':{
+            'score':education_score,
+            'resume_level':resume_edu_level,
+            'required_level':jd_edu_level
         }
     }
     
