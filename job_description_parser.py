@@ -204,7 +204,7 @@ def parse_jd_sections(sections):
 
         
 
-    # 3. Process sections.get('responsibilities', '') - split by lines/bullets
+    # 3. Process sections.get('responsibilities') - split by lines/bullets
     if "responsibilities" in sections:
         responsibilites_text = sections["responsibilities"]
         if responsibilites_text:
@@ -232,7 +232,7 @@ def parse_jd_sections(sections):
             logging.info("Responsibility section found but text is empty.")
 
             
-    # 4. Process sections.get('qualifications', '') - maybe look for experience patterns?
+    # 4. Process sections.get('qualifications') - maybe look for experience patterns?
     if "qualifications" in sections:
         qualifications_text = sections.get("qualifications", "")
 
@@ -377,22 +377,22 @@ def parse_jd_sections(sections):
         else:
             logging.info("Education section found but text is empty.")
         
-        logging.info("--- Determining Required Education Level ---")        
-        highest_level_found = -1
+        
+        logging.info("--- Determining LOWEST Education Level Mentioned ---")
+        lowest_level_found = None
         text_to_search = (sections.get('education', '') + "\n" + sections.get('qualifications', '')).lower()
 
         if text_to_search.strip():
-            # Iterate through keywords from highest level (5) down to lowest (0)
-            for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1], reverse=True):
+            for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1]):
                 pattern = r'\b' + re.escape(keyword) + r'\b'
                 if re.search(pattern, text_to_search):
-                    highest_level_found = level
-                    logging.info(f"Found highest level mention: {keyword} (Level {level})")
+                    lowest_level_found = level
+                    logging.info(f"Found lowest level mention: {keyword} (Level {level})")
                     break 
 
-        parsed_jd['required_education_level'] = highest_level_found if highest_level_found != -1 else None 
-        logging.info(f"Assigned highest education level mentioned: {parsed_jd['required_education_level']}")
-     
+        parsed_jd['required_education_level'] = lowest_level_found 
+        logging.info(f"Assigned lowest education level mentioned: {lowest_level_found}")
+
 
     # 8. Process sections.get('about')
     if "about" in sections:
@@ -414,7 +414,7 @@ def parse_jd_sections(sections):
             logging.info("About section found but text is empty.")
             
 
-    # 9. Process sections.get('compensation', '')
+    # 9. Process sections.get('compensation')
     if "compensation" in sections:
         compensation_text = sections["compensation"]
         header_pattern = SECTION_HEADERS["compensation"]
