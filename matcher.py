@@ -1,16 +1,33 @@
 import math
 import logging
+import string
 
 #TODO
 #Add Job Title Matching:
 #Add Keyword Matching:
+
+def clean_and_tokenize(text):
+    """
+    Lowercases, removes punctuation, splits into words.
+    Filters tokens longer than 1 character.
+    """
+    if not isinstance(text,str):
+        return set()
+    
+    text = text.lower()
+    text = ''.join(char for char in text if char not in string.punctuation)
+
+    tokens = text.split()
+    cleaned_tokens = {token for token in tokens if len(token)>1}
+
+    return cleaned_tokens
 
 def calculate_match_score(parsed_resume,parsed_jd):
 
     skill_score = 0.0
     final_score = 0.0
 
-    #---Skill Matching Logic---
+    #---Skill Matching---
     resume_skills_list = parsed_resume.get('skills',[])
     jd_skills_list = parsed_jd.get('skills',[])
 
@@ -25,7 +42,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     else:
         skill_score = 1.0 #if jd lists have no skills
 
-    #---Experience Years Matching Logic---
+    #---Experience Years Matching---
     resume_experience_years = parsed_resume.get('total_years_experience',0)
     jd_experience_years = parsed_jd.get('minimum_years_experience',None)
     experience_score = 0.0
@@ -60,13 +77,42 @@ def calculate_match_score(parsed_resume,parsed_jd):
         education_score = 0.0
         logging.info(f"Resume level ({resume_edu_level}) is below requirement ({jd_edu_level}).")
 
+    # ---Job Title Matching---
+    jd_title = parsed_jd.get('job_title', '')
+    resume_experience = parsed_resume.get('experience', [])
 
+    jd_tokens = clean_and_tokenize(jd_title)
+    print(f"DEBUG MATCHER: JD Title tokens: {jd_tokens}")
+
+    title_score = 0.0
+    matching_resume_titles = []
+    all_resume_titles_checked = [entry.get('job_title') if entry.get('job_title') is not None else '' for entry in resume_experience]
+
+    if jd_tokens:
+        for entry in resume_experience:
+            resume_title = entry.get('job_title')
+            
+            if resume_title:
+                resume_tokens = clean_and_tokenize(resume_title)
+                print(f"DEBUG MATCHER: Checking resume title '{resume_title}' tokens: {resume_tokens}")
+
+                common_tokens = jd_tokens.intersection(resume_tokens)
+                print(f"DEBUG MATCHER: Common tokens: {common_tokens}")
+
+                if any(len(token)>1 for token in common_tokens):
+                    title_score = 1.0
+                    if resume_title not in matching_resume_titles:
+                        matching_resume_titles.append(resume_title)
+                    break
+    print(f"DEBUG MATCHER: Job Title Score: {title_score}")
 
     #---Final Score Logic---
-    skill_weight = 0.5
+    skill_weight = 0.4
     experience_weight = 0.3
-    education_weight = 0.2
-    final_score = (skill_score * skill_weight) + (experience_score * experience_weight) + (education_score * education_weight)
+    education_weight = 0.1
+    title_weight = 0.2
+    final_score = (skill_score * skill_weight) + (experience_score * experience_weight) + \
+                 (education_score * education_weight) + (title_score * title_weight)
     
     results = {
         'score':final_score,
@@ -87,6 +133,12 @@ def calculate_match_score(parsed_resume,parsed_jd):
             'score':education_score,
             'resume_level':resume_edu_level,
             'required_level':jd_edu_level
+        },
+        'title_details':{
+            'score': title_score,
+            'jd_title': jd_title,
+            'resume_titles_checked':all_resume_titles_checked,
+            'matching_resume_titles': matching_resume_titles
         }
     }
     

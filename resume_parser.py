@@ -386,7 +386,6 @@ def parse_resume_sections(sections):
             
             #sentence does not contain a date range
             else:
-                #we will guess if it is a title/company line
                 is_potential_title = False
                 if len(sent_text.split()) < 7 and any(word[0].isupper() for word in sent_text.split() if len(word)>1):
                     is_potential_title = True

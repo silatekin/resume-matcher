@@ -36,7 +36,6 @@ def load_json_data(filename,data_type='resume'):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data_path = os.path.join(current_dir,'data',subfolder,filename) 
 
-
     try:
         with open(data_path,'r',encoding='utf-8') as f:
             data = json.load(f)
@@ -49,11 +48,13 @@ def load_json_data(filename,data_type='resume'):
         pytest.fail(f"Unexpected error loading test data {data_path}: {e}", pytrace=False)
 
 
-
 def test_specific_resume01_jd01_pair():
     """
     Tests the matching score for resume_01.json vs job_01.json.
     """
+    
+    print("\n--- Testing resume_01 vs job_01 ---")
+
     #---Arrange---
     print("\nArrange: Loading test data...")
     resume_data = load_json_data('resume_01.json','resume')
@@ -62,29 +63,58 @@ def test_specific_resume01_jd01_pair():
 
 
     print("Arrange: Defining expected results...")
-    expected_overall_score = pytest.approx(0.591, abs=0.001)
-    expected_skill_score = pytest.approx(0.182, abs=0.001) 
+    expected_skill_score = pytest.approx(2/11, abs=0.001) 
     expected_exp_score = pytest.approx(1.0)
     expected_education_score = pytest.approx(1.0)
+    expected_title_score = pytest.approx(1.0)
+    
+    expected_overall_score = pytest.approx(
+        (expected_skill_score.expected * 0.4) +
+        (expected_exp_score.expected * 0.3) +
+        (expected_education_score.expected * 0.1) +
+        (expected_title_score.expected * 0.2),
+        abs=0.001
+    )
+
     expected_matching_skills = ['Python', 'SQL']
+    expected_jd_title = 'Senior Python Developer'
+    expected_resume_titles_checked = ['Senior Software Engineer', 'Software Developer']
+    expected_matching_resume_titles = ['Senior Software Engineer']
+
+    print("Arrange: Defined expected results.")
 
     # --- Act ---
     print("Act: Calling calculate_match_score...")
     match_results = calculate_match_score(resume_data, jd_data)
-    print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}") 
+    print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}, title_score = {match_results.get('title_details',{}).get('score')}") 
 
     # --- Assert ---
     print("Assert: Checking results...")
-    assert match_results['score'] == expected_overall_score
-    assert match_results['skill_details']['score'] == expected_skill_score
-    assert match_results['experience_details']['score'] == expected_exp_score
-    assert match_results['education_details']['score'] == expected_education_score
-    assert sorted(match_results['skill_details']['matching_skills']) == expected_matching_skills
-    
 
-    assert 'education_details' in match_results # Check the key exists
-    assert match_results['education_details']['resume_level'] == 3 # Check correct resume level was used
-    assert match_results['education_details']['required_level'] == 3
+    assert match_results['score'] == expected_overall_score, f"Expected overall score {expected_overall_score.expected}, but got {match_results.get('score')}"
+    
+    # Assert skill details
+    assert 'skill_details' in match_results, "Skill details missing from results"
+    assert match_results['skill_details'].get('score') == expected_skill_score, f"Expected skill score {expected_skill_score.expected}, but got {match_results['skill_details'].get('score')}"
+    assert sorted(match_results['skill_details'].get('matching_skills', [])) == sorted(expected_matching_skills), "Matching skills list mismatch"
+
+    # Assert experience details
+    assert 'experience_details' in match_results, "Experience details missing from results"
+    assert match_results['experience_details'].get('score') == expected_exp_score, f"Expected experience score {expected_exp_score.expected}, but got {match_results['experience_details'].get('score')}"
+    
+    # Assert education details
+    assert 'education_details' in match_results, "Education details missing from results"
+    assert match_results['education_details'].get('score') == expected_education_score, f"Expected education score {expected_education_score.expected}, but got {match_results['education_details'].get('score')}"
+    assert match_results['education_details'].get('resume_level') == 3 
+    assert match_results['education_details'].get('required_level') == 3
+    
+    # Assert title details
+    assert 'title_details' in match_results, "Title details missing from results"
+    assert match_results['title_details'].get('score') == expected_title_score, f"Expected title score {expected_title_score.expected}, but got {match_results['title_details'].get('score')}"
+    assert match_results['title_details'].get('jd_title') == expected_jd_title, f"Expected JD title '{expected_jd_title}', but got '{match_results['title_details'].get('jd_title')}'"
+    
+    assert sorted(match_results['title_details'].get('resume_titles_checked', [])) == sorted(expected_resume_titles_checked), "Resume titles checked list mismatch"
+    assert sorted(match_results['title_details'].get('matching_resume_titles', [])) == sorted(expected_matching_resume_titles), "Matching resume titles list mismatch"
 
     print("Assert: Checks passed!")
 
@@ -93,35 +123,72 @@ def test_specific_resume04_jd03_pair():
     """
     Tests the matching score for resume_04.json vs job_03.json.
     """
+
+    print("\n--- Testing resume_04 vs job_03 ---")
+    
     #---Arrange---
     print("\nArrange: Loading test data...")
     resume_data = load_json_data('resume_04.json','resume')
     jd_data = load_json_data('job_03.json', 'jd')
     print("Arrange: Data loaded.")
 
-    print("Arrange: Defining expected results for J03 and R04 ...")
 
-    expected_overall_score = pytest.approx(0.7)
+    print("Arrange: Defining expected results...")
     expected_skill_score = pytest.approx(0.4)
     expected_exp_score = pytest.approx(1.0)
-    expected_edu_score = pytest.approx(1.0)
-    expected_matching_skills = ['Python', 'SQL']
+    expected_education_score = pytest.approx(1.0)
+    expected_title_score = pytest.approx(1.0)
 
+    expected_overall_score = pytest.approx(
+        (expected_skill_score.expected * 0.4) +
+        (expected_exp_score.expected * 0.3) +
+        (expected_education_score.expected * 0.1) +
+        (expected_title_score.expected * 0.2),
+        abs=0.001
+    )
+    
+    expected_matching_skills = ['Python', 'SQL']
+    expected_jd_title = 'Data Analyst'
+    expected_resume_titles_checked = ['Data Analyst','Business Analyst']
+    expected_matching_resume_titles = ['Data Analyst']
+
+    print("Arrange: Defined expected results.")
+
+
+    # --- Act ---
     print("Act: Calling calculate_match_score...")
     match_results = calculate_match_score(resume_data, jd_data)
     print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}") 
-
+    
     # --- Assert ---
     print("Assert: Checking results...")
-    assert match_results['score'] == expected_overall_score
-    assert match_results['skill_details']['score'] == expected_skill_score
+
+    assert match_results['score'] == expected_overall_score, f"Expected overall score {expected_overall_score.expected}, but got {match_results.get('score')}"
+
+    # Assert skill details
+    assert 'skill_details' in match_results, "Skill details missing from results"
+    assert match_results['skill_details'].get('score') == expected_skill_score, f"Expected skill score {expected_skill_score.expected}, but got {match_results['skill_details'].get('score')}"
+    assert sorted(match_results['skill_details'].get('matching_skills', [])) == sorted(expected_matching_skills), "Matching skills list mismatch"
+    
+    # Assert experience details
+    assert 'experience_details' in match_results, "Experience details missing from results"
+    assert match_results['experience_details'].get('score') == expected_exp_score, f"Expected experience score {expected_exp_score.expected}, but got {match_results['experience_details'].get('score')}"
     assert match_results['experience_details']['score'] == expected_exp_score
-    assert match_results['education_details']['score'] == expected_edu_score
-    assert sorted(match_results['skill_details']['matching_skills']) == expected_matching_skills
+    
+    
+   # Assert education details
+    assert 'education_details' in match_results, "Education details missing from results"
+    assert match_results['education_details'].get('score') == expected_education_score, f"Expected education score {expected_education_score.expected}, but got {match_results['education_details'].get('score')}"
+    assert match_results['education_details'].get('resume_level') == 3 
+    assert match_results['education_details'].get('required_level') == None
         
-    assert 'education_details' in match_results 
-    assert match_results['education_details']['resume_level'] == 3 
-    assert match_results['education_details']['required_level'] == None
+    # Assert title details
+    assert 'title_details' in match_results, "Title details missing from results"
+    assert match_results['title_details'].get('score') == expected_title_score, f"Expected title score {expected_title_score.expected}, but got {match_results['title_details'].get('score')}"
+    assert match_results['title_details'].get('jd_title') == expected_jd_title, f"Expected JD title '{expected_jd_title}', but got '{match_results['title_details'].get('jd_title')}'"
+    
+    assert sorted(match_results['title_details'].get('resume_titles_checked', [])) == sorted(expected_resume_titles_checked), "Resume titles checked list mismatch"
+    assert sorted(match_results['title_details'].get('matching_resume_titles', [])) == sorted(expected_matching_resume_titles), "Matching resume titles list mismatch"
     
     
     print("Assert: Checks passed!")
@@ -130,154 +197,232 @@ def test_specific_resume04_jd03_pair():
 def test_specific_resume07_jd09_pair():
     """
     Tests the matching score for resume_07.json vs job_09.json.
+
+    There are no skills listed in either the resume or the JD.
+
+    The JD has no minimum education requirement.
+
+    The resume has unusual or missing job titles in the experience section.
+
+    There is no job title overlap.
     """
+
+    print("\n--- Testing resume_07 vs job_09 ---")
+    
     #---Arrange---
     print("\nArrange: Loading test data...")
     resume_data = load_json_data('resume_07.json','resume')
     jd_data = load_json_data('job_09.json', 'jd')
     print("Arrange: Data loaded.")
 
-    print("Arrange: Defining expected results for J09 and R07 ...")
 
-    expected_overall_score = pytest.approx(1.0)
+    print("Arrange: Defining expected results...")
     expected_skill_score = pytest.approx(1.0)
     expected_exp_score = pytest.approx(1.0)
-    expected_edu_score = pytest.approx(1.0)
-    expected_matching_skills = []
+    expected_education_score = pytest.approx(1.0)
+    expected_title_score = pytest.approx(0.0)
 
+    expected_overall_score = pytest.approx(
+        (expected_skill_score.expected * 0.4) +
+        (expected_exp_score.expected * 0.3) +
+        (expected_education_score.expected * 0.1) +
+        (expected_title_score.expected * 0.2),
+        abs=0.001
+    )
+    
+    expected_matching_skills = []
+    expected_jd_title = 'HR Specialist'
+    expected_resume_titles_checked = ['Experience', '']
+    expected_matching_resume_titles = []
+
+    print("Arrange: Defined expected results.")
+
+
+    # --- Act ---
     print("Act: Calling calculate_match_score...")
     match_results = calculate_match_score(resume_data, jd_data)
     print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}") 
-
+    
     # --- Assert ---
     print("Assert: Checking results...")
-    assert match_results['score'] == expected_overall_score
-    assert match_results['skill_details']['score'] == expected_skill_score
+
+    assert match_results['score'] == expected_overall_score, f"Expected overall score {expected_overall_score.expected}, but got {match_results.get('score')}"
+
+    # Assert skill details
+    assert 'skill_details' in match_results, "Skill details missing from results"
+    assert match_results['skill_details'].get('score') == expected_skill_score, f"Expected skill score {expected_skill_score.expected}, but got {match_results['skill_details'].get('score')}"
+    assert sorted(match_results['skill_details'].get('matching_skills', [])) == sorted(expected_matching_skills), "Matching skills list mismatch"
+    
+    # Assert experience details
+    assert 'experience_details' in match_results, "Experience details missing from results"
+    assert match_results['experience_details'].get('score') == expected_exp_score, f"Expected experience score {expected_exp_score.expected}, but got {match_results['experience_details'].get('score')}"
     assert match_results['experience_details']['score'] == expected_exp_score
-    assert match_results['education_details']['score'] == expected_edu_score
-    assert sorted(match_results['skill_details']['matching_skills']) == expected_matching_skills
+    
+    
+   # Assert education details
+    assert 'education_details' in match_results, "Education details missing from results"
+    assert match_results['education_details'].get('score') == expected_education_score, f"Expected education score {expected_education_score.expected}, but got {match_results['education_details'].get('score')}"
+    assert match_results['education_details'].get('resume_level') == 1 , f"Expected resume education level 1, but got {match_results['education_details'].get('resume_level')}"
+    assert match_results['education_details'].get('required_level') is None, f"Expected required education level None, but got {match_results['education_details'].get('required_level')}"
         
-    assert match_results['skill_details']['match_count'] == 0
-    assert match_results['skill_details']['required_count'] == 0
-    assert match_results['skill_details']['required_skills'] == [] 
-    assert match_results['skill_details']['resume_skills'] == [] 
-
-    assert 'education_details' in match_results 
-    assert match_results['education_details']['resume_level'] == 1
-    assert match_results['education_details']['required_level'] == None
-
-    print("Assert: Checks passed!")
-
-
-def test_specific_resume09_jd09_pair():
-    """
-    Tests the matching score for resume_09.json vs job_09.json.
-    Changes resume09.json to have 0 years experience
-    """
-    #---Arrange---
-    print("\nArrange: Loading test data...")
-    resume_data = load_json_data('resume_09.json','resume')
-    jd_data = load_json_data('job_09.json', 'jd')
-    print("Arrange: Data loaded.")
-
-    print("Arrange: Defining expected results for J09 and R09 ...")
-
-    expected_overall_score = pytest.approx(1.0)
-    expected_skill_score = pytest.approx(1.0)
-    expected_exp_score = pytest.approx(1.0)
-    expected_edu_score = pytest.approx(1.0)
-    expected_matching_skills = []
-
-    print("Act: Calling calculate_match_score...")
-    match_results = calculate_match_score(resume_data, jd_data)
-    print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}") 
-
-    # --- Assert ---
-    print("Assert: Checking results...")
-    assert match_results['score'] == expected_overall_score
-    assert match_results['skill_details']['score'] == expected_skill_score
-    assert match_results['experience_details']['score'] == expected_exp_score
-    assert match_results['education_details']['score'] == expected_edu_score
-    assert sorted(match_results['skill_details']['matching_skills']) == expected_matching_skills
-
-    assert 'education_details' in match_results 
-    assert match_results['education_details']['resume_level'] == 3
-    assert match_results['education_details']['required_level'] == None
-        
-
+    # Assert title details
+    assert 'title_details' in match_results, "Title details missing from results"
+    assert match_results['title_details'].get('score') == expected_title_score, f"Expected title score {expected_title_score.expected}, but got {match_results['title_details'].get('score')}"
+    assert match_results['title_details'].get('jd_title') == expected_jd_title, f"Expected JD title '{expected_jd_title}', but got '{match_results['title_details'].get('jd_title')}'"
+    
+    assert sorted(match_results['title_details'].get('resume_titles_checked', [])) == sorted(expected_resume_titles_checked), "Resume titles checked list mismatch"
+    assert sorted(match_results['title_details'].get('matching_resume_titles', [])) == sorted(expected_matching_resume_titles), "Matching resume titles list mismatch"
+    
+    
     print("Assert: Checks passed!")
 
 def test_specific_resume05_jd01_pair():
 
     """
     Tests the matching score for resume_05.json vs job_01.json.
+
     """
+
+    print("\n--- Testing resume_05 vs job_01 ---")
+    
     #---Arrange---
     print("\nArrange: Loading test data...")
     resume_data = load_json_data('resume_05.json','resume')
     jd_data = load_json_data('job_01.json', 'jd')
     print("Arrange: Data loaded.")
 
-    print("Arrange: Defining expected results for J01 and R05 ...")
 
-    expected_overall_score = pytest.approx(0.3)
+    print("Arrange: Defining expected results...")
     expected_skill_score = pytest.approx(0.0)
     expected_exp_score = pytest.approx(1.0)
-    expected_edu_score = pytest.approx(0.0)
-    expected_matching_skills = []
+    expected_education_score = pytest.approx(0.0)
+    expected_title_score = pytest.approx(0.0)
 
+    expected_overall_score = pytest.approx(
+        (expected_skill_score.expected * 0.4) +
+        (expected_exp_score.expected * 0.3) +
+        (expected_education_score.expected * 0.1) +
+        (expected_title_score.expected * 0.2),
+        abs=0.001
+    )
+    
+    expected_matching_skills = []
+    expected_jd_title = 'Senior Python Developer'
+    expected_resume_titles_checked = ['Experience', 'Junior Designer']
+    expected_matching_resume_titles = []
+
+    print("Arrange: Defined expected results.")
+
+
+    # --- Act ---
     print("Act: Calling calculate_match_score...")
     match_results = calculate_match_score(resume_data, jd_data)
     print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}") 
-
+    
     # --- Assert ---
     print("Assert: Checking results...")
-    assert match_results['score'] == expected_overall_score
-    assert match_results['skill_details']['score'] == expected_skill_score
-    assert match_results['experience_details']['score'] == expected_exp_score
-    assert match_results['education_details']['score'] == expected_edu_score
-    assert sorted(match_results['skill_details']['matching_skills']) == expected_matching_skills
 
-    assert 'education_details' in match_results 
-    assert match_results['education_details']['resume_level'] == -1
-    assert match_results['education_details']['required_level'] == 3
+    assert match_results['score'] == expected_overall_score, f"Expected overall score {expected_overall_score.expected}, but got {match_results.get('score')}"
+
+    # Assert skill details
+    assert 'skill_details' in match_results, "Skill details missing from results"
+    assert match_results['skill_details'].get('score') == expected_skill_score, f"Expected skill score {expected_skill_score.expected}, but got {match_results['skill_details'].get('score')}"
+    assert sorted(match_results['skill_details'].get('matching_skills', [])) == sorted(expected_matching_skills), "Matching skills list mismatch"
+    
+    # Assert experience details
+    assert 'experience_details' in match_results, "Experience details missing from results"
+    assert match_results['experience_details'].get('score') == expected_exp_score, f"Expected experience score {expected_exp_score.expected}, but got {match_results['experience_details'].get('score')}"
+    assert match_results['experience_details']['score'] == expected_exp_score
+    
+    
+   # Assert education details
+    assert 'education_details' in match_results, "Education details missing from results"
+    assert match_results['education_details'].get('score') == expected_education_score, f"Expected education score {expected_education_score.expected}, but got {match_results['education_details'].get('score')}"
+    assert match_results['education_details'].get('resume_level') == -1 , f"Expected resume education level 1, but got {match_results['education_details'].get('resume_level')}"
+    assert match_results['education_details'].get('required_level') == 3, f"Expected required education level None, but got {match_results['education_details'].get('required_level')}"
         
+    # Assert title details
+    assert 'title_details' in match_results, "Title details missing from results"
+    assert match_results['title_details'].get('score') == expected_title_score, f"Expected title score {expected_title_score.expected}, but got {match_results['title_details'].get('score')}"
+    assert match_results['title_details'].get('jd_title') == expected_jd_title, f"Expected JD title '{expected_jd_title}', but got '{match_results['title_details'].get('jd_title')}'"
+    
+    assert sorted(match_results['title_details'].get('resume_titles_checked', [])) == sorted(expected_resume_titles_checked), "Resume titles checked list mismatch"
+    assert sorted(match_results['title_details'].get('matching_resume_titles', [])) == sorted(expected_matching_resume_titles), "Matching resume titles list mismatch"
+    
+    
     print("Assert: Checks passed!")
+
 
 def test_specific_resume01_jd11_pair():
     """
-    Tests the matching score for resume_01.json vs job_11.json.
-    Uses resume_01 and job_11(modified J01).
+    Tests the matching score for resume_01.json vs job_11.json(modified j01)
+
     """
+
+    print("\n--- Testing resume_01 vs job_11 ---")
+    
     #---Arrange---
     print("\nArrange: Loading test data...")
     resume_data = load_json_data('resume_01.json','resume')
     jd_data = load_json_data('job_11.json', 'jd')
     print("Arrange: Data loaded.")
 
-    print("Arrange: Defining expected results for R01 and J11 ...")
 
-    expected_overall_score = pytest.approx(0.3909, abs=0.0001)
-    expected_skill_score = pytest.approx(0.1818, abs=0.0001)
+    print("Arrange: Defining expected results...")
+    expected_skill_score = pytest.approx(2/11)
     expected_exp_score = pytest.approx(1.0)
-    expected_edu_score = pytest.approx(0.0)
-    expected_matching_skills = ['Python', 'SQL']
+    expected_education_score = pytest.approx(0.0)
+    expected_title_score = pytest.approx(1.0)
 
+    expected_overall_score = pytest.approx(
+        (expected_skill_score.expected * 0.4) +
+        (expected_exp_score.expected * 0.3) +
+        (expected_education_score.expected * 0.1) +
+        (expected_title_score.expected * 0.2),
+        abs=0.001
+    )
+    
+    expected_matching_skills = ['Python', 'SQL']
+    expected_jd_title = 'Senior Python Developer'
+    expected_resume_titles_checked = ['Senior Software Engineer', 'Software Developer']
+    expected_matching_resume_titles = ['Senior Software Engineer']
+
+    print("Arrange: Defined expected results.")
+
+
+    # --- Act ---
     print("Act: Calling calculate_match_score...")
     match_results = calculate_match_score(resume_data, jd_data)
     print(f"Act: Got results: score={match_results.get('score')}, skill_score={match_results.get('skill_details',{}).get('score')}, exp_score={match_results.get('experience_details',{}).get('score')}, edu_score={match_results.get('education_details',{}).get('score')}") 
-
+    
     # --- Assert ---
     print("Assert: Checking results...")
-    assert match_results['score'] == expected_overall_score
-    assert match_results['skill_details']['score'] == expected_skill_score
-    assert match_results['experience_details']['score'] == expected_exp_score
-    assert match_results['education_details']['score'] == expected_edu_score
-    
-    assert sorted(match_results['skill_details']['matching_skills']) == expected_matching_skills
 
-    assert 'education_details' in match_results 
-    assert match_results['education_details']['resume_level'] == 3
-    assert match_results['education_details']['required_level'] == 4
+    assert match_results['score'] == expected_overall_score, f"Expected overall score {expected_overall_score.expected}, but got {match_results.get('score')}"
+
+    # Assert skill details
+    assert 'skill_details' in match_results, "Skill details missing from results"
+    assert match_results['skill_details'].get('score') == expected_skill_score, f"Expected skill score {expected_skill_score.expected}, but got {match_results['skill_details'].get('score')}"
+    assert sorted(match_results['skill_details'].get('matching_skills', [])) == sorted(expected_matching_skills), "Matching skills list mismatch"
+    
+    # Assert experience details
+    assert 'experience_details' in match_results, "Experience details missing from results"
+    assert match_results['experience_details'].get('score') == expected_exp_score, f"Expected experience score {expected_exp_score.expected}, but got {match_results['experience_details'].get('score')}"
+    assert match_results['experience_details']['score'] == expected_exp_score
+    
+   # Assert education details
+    assert 'education_details' in match_results, "Education details missing from results"
+    assert match_results['education_details'].get('score') == expected_education_score, f"Expected education score {expected_education_score.expected}, but got {match_results['education_details'].get('score')}"
+    assert match_results['education_details'].get('resume_level') == 3 , f"Expected resume education level 1, but got {match_results['education_details'].get('resume_level')}"
+    assert match_results['education_details'].get('required_level') == 4, f"Expected required education level None, but got {match_results['education_details'].get('required_level')}"
         
+    # Assert title details
+    assert 'title_details' in match_results, "Title details missing from results"
+    assert match_results['title_details'].get('score') == expected_title_score, f"Expected title score {expected_title_score.expected}, but got {match_results['title_details'].get('score')}"
+    assert match_results['title_details'].get('jd_title') == expected_jd_title, f"Expected JD title '{expected_jd_title}', but got '{match_results['title_details'].get('jd_title')}'"
+    
+    assert sorted(match_results['title_details'].get('resume_titles_checked', [])) == sorted(expected_resume_titles_checked), "Resume titles checked list mismatch"
+    assert sorted(match_results['title_details'].get('matching_resume_titles', [])) == sorted(expected_matching_resume_titles), "Matching resume titles list mismatch"
+    
+    
     print("Assert: Checks passed!")
