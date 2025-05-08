@@ -106,13 +106,74 @@ def calculate_match_score(parsed_resume,parsed_jd):
                     break
     print(f"DEBUG MATCHER: Job Title Score: {title_score}")
 
+    #---Keyword Matching---
+    """
+    Look for keywords in responsibilities and qualifications sections in jd
+    Look for experience or summary sections in resume
+    Check overlapping tokens 
+    """
+    jd_keyword_sections = []
+    
+    if parsed_jd.get('responsibilities'):
+        jd_keyword_sections.extend(parsed_jd['responsibilities'])
+    if parsed_jd.get('qualifications'):
+        jd_keyword_sections.extend(parsed_jd['qualifications'])
+    if parsed_jd.get('preferred_qualifications'):
+        jd_keyword_sections.extend(parsed_jd['preferred_qualifications'])
+    
+    jd_keyword_text = " ".join(jd_keyword_sections)
+    
+    print(f"DEBUG MATCHER: Combined JD Keyword Text (first 100 chars): {jd_keyword_text[:100]}...") 
+
+    resume_keyword_sections = []
+    resume_experience = parsed_resume.get('experience',[])
+
+    for entry in resume_experience:
+        description = entry.get('description','')
+        if description:
+            resume_keyword_sections.append(description)
+
+
+    resume_keyword_text = " ".join(resume_keyword_sections)
+
+    print(f"DEBUG MATCHER: Combined Resume Keyword Text (first 100 chars): {resume_keyword_text[:100]}...") 
+
+    jd_keyword_tokens = clean_and_tokenize(jd_keyword_text)
+    resume_keyword_tokens = clean_and_tokenize(resume_keyword_text)
+
+    print(f"DEBUG MATCHER: JD Keyword tokens count: {len(jd_keyword_tokens)}") 
+    print(f"DEBUG MATCHER: Resume Keyword tokens count: {len(resume_keyword_tokens)}") 
+
+
+    matching_keyword_tokens = jd_keyword_tokens.intersection(resume_keyword_tokens)
+    matching_keywords = sorted(list(matching_keyword_tokens))
+
+    print(f"DEBUG MATCHER: Matching keyword tokens count: {len(matching_keywords)}") 
+    print(f"DEBUG MATCHER: Matching keywords: {matching_keywords}")
+
+    total_jd_keywords_count = len(jd_keyword_tokens)
+    matching_keywords_count = len(matching_keywords)
+
+    keyword_score = 0.0
+
+    if total_jd_keywords_count > 0:
+        keyword_score = matching_keywords_count / total_jd_keywords_count
+    else:
+        keyword_score = 1.0
+
+    print(f"DEBUG MATCHER: Keyword Score: {keyword_score}")
+
+
     #---Final Score Logic---
-    skill_weight = 0.4
-    experience_weight = 0.3
+    skill_weight = 0.3
+    experience_weight = 0.2
     education_weight = 0.1
-    title_weight = 0.2
+    title_weight = 0.1
+    keyword_weight = 0.3
+
     final_score = (skill_score * skill_weight) + (experience_score * experience_weight) + \
-                 (education_score * education_weight) + (title_score * title_weight)
+                 (education_score * education_weight) + (title_score * title_weight)+ \
+                 (keyword_score * keyword_weight)
     
     results = {
         'score':final_score,
@@ -139,22 +200,14 @@ def calculate_match_score(parsed_resume,parsed_jd):
             'jd_title': jd_title,
             'resume_titles_checked':all_resume_titles_checked,
             'matching_resume_titles': matching_resume_titles
+        },
+        'keyword_details':{
+            'score':keyword_score,
+            'matching_keywords': matching_keywords,
+            'total_jd_keywords_count':total_jd_keywords_count
         }
+
     }
     
     return results
 
-
-"""
-dummy_resume = {'skills': ['Python', 'SQL', 'Data Analysis'], 'total_years_experience': 5}
-dummy_jd = {'skills': ['Python', 'Java', 'SQL', 'Cloud'], 'minimum_years_experience': 3}
-
-match_results = calculate_match_score(dummy_resume, dummy_jd)
-
-print(f"Calculated Overall Match Score: {match_results['score']:.2f}")
-print("\n--- Skill Match Details ---")
-print(f"Final Score: {match_results['score']:.2f}")
-print(f"Skill Score: {match_results['skill_details']['score']:.2f}")
-print(f"Experience score: {match_results['experience_details']['score']}")
-print(f"Matching Skills ({match_results['skill_details']['match_count']}/{match_results['skill_details']['required_count']}): {match_results['skill_details']['matching_skills']}")
-"""
