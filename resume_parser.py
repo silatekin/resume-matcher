@@ -13,7 +13,8 @@ try:
     nlp = spacy.load("en_core_web_md")
     logging.info("Model loaded succesfully.")
 except OSError:
-    logging.error("Spacy model not found.")
+    logging.error("Spacy model not found. Please run 'python -m spacy download en_core_web_md'") # Added instruction
+    nlp = None
 
 def read_text_file(file_path):
     try:
@@ -50,13 +51,13 @@ def load_skills(skill_file=None):
             logging.info(f"Loaded {len(valid_skills)} skills from {skill_file}")
             return valid_skills
     except FileNotFoundError:
-        logging.error(f"Skill file not found.")
+        logging.error(f"Skill file not found at {skill_file}") 
         return []
     except json.JSONDecodeError:
-        logging.error(f"Error decoding JSON from skill file.")
+        logging.error(f"Error decoding JSON from skill file: {skill_file}") 
         return []
     except Exception as e:
-        logging.error("Error loading skills.")
+        logging.error(f"General error loading skills from {skill_file}: {e}") 
         return []
 
 tech_skills = load_skills()
@@ -87,11 +88,11 @@ def segment_resume(raw_text):
     current_section_content = []
 
     for line in lines:
-        print(f"Segmenter checking line: '{line}'")
+        #print(f"Segmenter checking line: '{line}'")
         matched_key = None
         for key,pattern in compiled_patterns.items():
             if pattern.match(line):
-                print(f"  ---> MATCHED {key}!")
+                #print(f"  ---> MATCHED {key}!")
                 matched_key = key
                 break 
         
@@ -122,10 +123,11 @@ def parse_date(date_string):
     date_string = date_string.strip()
 
     if date_string.lower() in ["present","current","now","today","til date"]:
-        return datetime.datetime.now() 
+        return datetime.datetime.now().date() 
     try:
-        return parse_datetime(date_string, default=datetime.datetime(1, 1, 1), fuzzy=False) 
-    except (ValueError, OverflowError):
+        dt_obj = parse_datetime(date_string, default=datetime.datetime(1, 1, 1), fuzzy=False) 
+        return dt_obj.date()
+    except (ValueError, OverflowError,TypeError):
         pass
 
     patterns = [
@@ -137,7 +139,7 @@ def parse_date(date_string):
 
     #---Plan B(if try block fails)
     for pattern in patterns:
-        match = re.search(pattern,date_string)
+        match = re.search(pattern, date_string, re.IGNORECASE)
         if match:
             try:
                 if len(match.groups()) == 1: #only year matched(pattern 1)
@@ -150,14 +152,18 @@ def parse_date(date_string):
                     except ValueError: #month is not a number ie May
                         # Try parsing the month name using dateutil again
                         try:
-                            month_dt = parse_date(month_str,default=datetime(1, 1, 1))
+                            month_dt = parse_datetime(month_str, default=datetime.datetime(int(year_str), 1, 1))
                             month = month_dt.month #Gets the month number
-                        except ValueError:
+                        except (ValueError, TypeError):
+                            logging.warning(f"Could not parse month name: '{month_str}' in '{date_string}'")
                             continue # Invalid month name, try next regex pattern
+                    if not (1 <= month <= 12): 
+                        logging.warning(f"Invalid month '{month}' in '{date_string}'")
+                        continue    
                     #Construct date assuming 1st day
                     return datetime.datetime(int(year_str), month, 1)
             except (ValueError, OverflowError):
-                # Invalid number (e.g., year 99999, month 15)
+                logging.warning(f"Error parsing matched date parts from '{date_string}' with pattern '{pattern}'")
                 continue
 
     logging.warning(f"Could not parse date string: '{date_string}'")
@@ -192,6 +198,15 @@ def get_education_level(text):
 
 def parse_resume_sections(sections):
 
+    if nlp is None:
+        logging.error("Spacy NLP model not loaded. Cannot perform detailed parsing.")
+        return {
+            "skills": ["NLP model not loaded"],
+            "education_details": [], "contact_info": {}, "experience": [],
+            "total_years_experience": 0.0, "education_level": -1,
+            "raw_entities": defaultdict(list), "companies": []
+        }
+
     parsed_resume = {
                 "skills":[],
                 "education_details":[],
@@ -199,7 +214,8 @@ def parse_resume_sections(sections):
                 "experience":[],
                 "total_years_experience":0.0,
                 "education_level": -1,
-                "raw_entities": defaultdict(list) #Storing all raw NER entities if needed later
+                "raw_entities": defaultdict(list), #Storing all raw NER entities if needed later
+                "companies": [],
     }
 
     #-------Skill Extraction--------
@@ -209,7 +225,7 @@ def parse_resume_sections(sections):
         found_skills = set() 
 
         matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
-        patterns = [nlp(skill) for skill in tech_skills]
+        patterns = [nlp.make_doc(skill) for skill in tech_skills]
         matcher.add("TECH_SKILLS",patterns)
         matches = matcher(skills_doc)
 
@@ -262,8 +278,6 @@ def parse_resume_sections(sections):
                     institution_mention = ent.text
                 elif ent.label_ == "DATE" and not date_mention:
                     date_mention = ent.text
-            
-            
             if degree_mention or institution_mention or date_mention:
                 parsed_resume["education_details"].append({
                    "degree_mention": degree_mention,
@@ -290,13 +304,13 @@ def parse_resume_sections(sections):
         for line in experience_text.splitlines():
             sent_text = line.strip()
             if not sent_text: continue
-            print(f"\n--- Processing Experience Sentence ---")
-            print(f"SENTENCE: '{sent_text}'")
+            #print(f"\n--- Processing Experience Sentence ---")
+            #print(f"SENTENCE: '{sent_text}'")
 
             date_range_pattern =  r"(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4})\s*(?:-|–|to|until)\s*(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4}|Present|Current|Now)\b"
 
             date_match = re.search(date_range_pattern,sent_text,re.IGNORECASE)
-            print(f"DATE MATCH FOUND: {bool(date_match)}")
+            #print(f"DATE MATCH FOUND: {bool(date_match)}")
 
             start_date_obj = None
             end_date_obj = None
@@ -327,7 +341,7 @@ def parse_resume_sections(sections):
                                 text_before_company = re.sub(r'[,|]\s*$', '', text_before_company).strip()
                                 if text_before_company and text_before_company[0].isupper():
                                     job_title = text_before_company 
-                                    print(f"--> Guessed title from same line: '{job_title}'") 
+                                    #print(f"--> Guessed title from same line: '{job_title}'") 
                         except Exception as e:
                             logging.warning(f"Error guessing title from same line: {e}")    
                     
@@ -400,17 +414,17 @@ def parse_resume_sections(sections):
                 if is_potential_title:
                     potential_title_lines.append(sent_text)
                 
-                print(f"IS POTENTIAL TITLE GUESS: {is_potential_title}")
+                #print(f"IS POTENTIAL TITLE GUESS: {is_potential_title}")
 
                 if not is_potential_title and current_role:
-                    print(f"APPENDING TO DESCRIPTION for role: {current_role.get('job_title') or current_role.get('company')}") 
+                    #print(f"APPENDING TO DESCRIPTION for role: {current_role.get('job_title') or current_role.get('company')}") 
                     current_role["description"] = (current_role.get("description", "") + "\n" + sent_text).strip()
-                    print(f"  New Description: '{current_role['description'][:50]}...'")
+                    #print(f"New Description: '{current_role['description'][:50]}...'")
 
-                elif is_potential_title:
-                    print(f"ADDING TO POTENTIAL TITLE LINES: '{sent_text}'") 
-                elif not current_role:
-                    print("SKIPPING (No current role established yet)")
+                #elif is_potential_title:
+                   # print(f"ADDING TO POTENTIAL TITLE LINES: '{sent_text}'") 
+                #elif not current_role:
+                    #print("SKIPPING (No current role established yet)")
 
         if current_role:
             print(f"\n--- Finalizing Last Role ---")
@@ -425,7 +439,7 @@ def parse_resume_sections(sections):
                 except TypeError:
                      logging.warning(f"Could not calculate duration for last role: {current_role.get('job_title')}")
             
-            print(f"===> APPENDING previous role: {current_role}")
+            #print(f"===> APPENDING previous role: {current_role}")
             parsed_resume["experience"].append(current_role)
 
         parsed_resume["total_years_experience"] = round(total_experience_duration_days / 365.25, 1)
@@ -463,6 +477,101 @@ def parse_resume_sections(sections):
 
     return parsed_resume
 
+def get_text_from_txt_object(uploaded_file_object):
+    try:
+        raw_text = uploaded_file_object.read().decode('utf-8')
+        logging.info("Successfully read TXT file content.")
+        return raw_text
+    except Exception as e:
+        logging.error(f"Error reading TXT file object: {e}")
+        return None
+
+def get_text_from_docx_object(uploaded_file_object):
+    # Ensure you have 'pip install python-docx'
+    from docx import Document # Import here or at the top of the file
+    try:
+        doc = Document(uploaded_file_object) # python-docx can usually handle file-like objects
+        full_text = [para.text for para in doc.paragraphs]
+        raw_text = '\n'.join(full_text)
+        logging.info("Successfully read DOCX file content.")
+        return raw_text
+    except Exception as e:
+        logging.error(f"Error reading DOCX file object: {e}")
+        return None
+
+def get_text_from_pdf_object(uploaded_file_object):
+    # Ensure you have 'pip install pdfplumber'
+    import pdfplumber # Import here or at the top of the file
+    try:
+        full_text = []
+        with pdfplumber.open(uploaded_file_object) as pdf:
+            for page in pdf.pages:
+                extracted_page_text = page.extract_text()
+                if extracted_page_text: # Check if text was extracted
+                    full_text.append(extracted_page_text)
+        raw_text = '\n'.join(full_text)
+        if not raw_text.strip():
+            logging.warning(f"No text extracted from PDF: {uploaded_file_object.name}")
+            return None # Or handle as an error condition differently
+        logging.info("Successfully read PDF file content.")
+        return raw_text
+    except Exception as e:
+        logging.error(f"Error reading PDF file object: {e}")
+        return None
+
+# Funct.s for streamlit
+
+def process_streamlit_file(uploaded_file_object):
+    logging.info(f"--- process_streamlit_file: STARTED for {uploaded_file_object.name} ---")
+    file_type = uploaded_file_object.type
+    raw_text = None
+
+    if file_type == "text/plain":
+        raw_text = get_text_from_txt_object(uploaded_file_object)
+    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document": # DOCX
+        raw_text = get_text_from_docx_object(uploaded_file_object)
+    elif file_type == "application/pdf":
+        raw_text = get_text_from_pdf_object(uploaded_file_object)
+    else:
+        logging.error(f"Unsupported file type: {file_type}")
+        return None
+
+    if raw_text is None or not raw_text.strip():
+        logging.error("No text extracted or text is empty from streamlit file.")
+        return None
+
+    logging.info(f"Raw text extracted for parsing (snippet): {raw_text[:750]}...")
+    sections = segment_resume(raw_text) # 
+    if not sections:
+        logging.error("Segmentation returned no sections.")
+        return {"error": "Segmentation failed", "raw_text_snippet": raw_text[:200]}
+
+    final_dictionary = parse_resume_sections(sections) 
+
+    if final_dictionary is None:
+        logging.error("parse_resume_sections returned None.")
+        return None
+
+    # Converting datetime objects to strings
+    if 'experience' in final_dictionary and isinstance(final_dictionary['experience'], list):
+        for job in final_dictionary['experience']:
+            if isinstance(job, dict):
+                if 'start_date' in job and isinstance(job['start_date'], (datetime.date, datetime.datetime)):
+                    job["start_date"] = job['start_date'].strftime('%Y-%m-%d')
+                if 'end_date' in job and hasattr(job['end_date'], 'isoformat'):
+                    if isinstance(job['end_date'], (datetime.date, datetime.datetime)):
+                        job['end_date'] = job['end_date'].strftime('%Y-%m-%d')
+
+    
+    if raw_text and final_dictionary is not None:
+        final_dictionary["raw_text_snippet"] = raw_text[:750]
+    
+    
+    logging.info(f"--- process_streamlit_file: RETURNING (snippet): {str(final_dictionary)[:300]} ---")
+    return final_dictionary
+
+
+
 
 def parse_resume_file(filepath):
     try:
@@ -488,13 +597,14 @@ def parse_resume_file(filepath):
                             job['end_date'] = job['end_date'].strftime('%Y-%m-%d')
 
         return final_dictionary
-    
 
-    
     except Exception as e:
         print(f"Error parsing resume file {filepath}: {e}")
         return None 
-        
+       
+
+
+#-------------------------------------------------------------------------------
 
 """
       
@@ -552,6 +662,5 @@ if __name__ == "__main__":
         save_to_json(parsed_data, output_json_path)
     else:
         logging.error("Could not read resume file. Exiting.")
-
 
 """

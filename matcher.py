@@ -82,7 +82,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     resume_experience = parsed_resume.get('experience', [])
 
     jd_tokens = clean_and_tokenize(jd_title)
-    print(f"DEBUG MATCHER: JD Title tokens: {jd_tokens}")
+    #print(f"DEBUG MATCHER: JD Title tokens: {jd_tokens}")
 
     title_score = 0.0
     matching_resume_titles = []
@@ -94,17 +94,17 @@ def calculate_match_score(parsed_resume,parsed_jd):
             
             if resume_title:
                 resume_tokens = clean_and_tokenize(resume_title)
-                print(f"DEBUG MATCHER: Checking resume title '{resume_title}' tokens: {resume_tokens}")
+                #print(f"DEBUG MATCHER: Checking resume title '{resume_title}' tokens: {resume_tokens}")
 
                 common_tokens = jd_tokens.intersection(resume_tokens)
-                print(f"DEBUG MATCHER: Common tokens: {common_tokens}")
+                #print(f"DEBUG MATCHER: Common tokens: {common_tokens}")
 
                 if any(len(token)>1 for token in common_tokens):
                     title_score = 1.0
                     if resume_title not in matching_resume_titles:
                         matching_resume_titles.append(resume_title)
                     break
-    print(f"DEBUG MATCHER: Job Title Score: {title_score}")
+    #print(f"DEBUG MATCHER: Job Title Score: {title_score}")
 
     #---Keyword Matching---
     """
@@ -123,7 +123,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     
     jd_keyword_text = " ".join(jd_keyword_sections)
     
-    print(f"DEBUG MATCHER: Combined JD Keyword Text (first 100 chars): {jd_keyword_text[:100]}...") 
+    #print(f"DEBUG MATCHER: Combined JD Keyword Text (first 100 chars): {jd_keyword_text[:100]}...") 
 
     resume_keyword_sections = []
     resume_experience = parsed_resume.get('experience',[])
@@ -136,20 +136,20 @@ def calculate_match_score(parsed_resume,parsed_jd):
 
     resume_keyword_text = " ".join(resume_keyword_sections)
 
-    print(f"DEBUG MATCHER: Combined Resume Keyword Text (first 100 chars): {resume_keyword_text[:100]}...") 
+    #print(f"DEBUG MATCHER: Combined Resume Keyword Text (first 100 chars): {resume_keyword_text[:100]}...") 
 
     jd_keyword_tokens = clean_and_tokenize(jd_keyword_text)
     resume_keyword_tokens = clean_and_tokenize(resume_keyword_text)
 
-    print(f"DEBUG MATCHER: JD Keyword tokens count: {len(jd_keyword_tokens)}") 
-    print(f"DEBUG MATCHER: Resume Keyword tokens count: {len(resume_keyword_tokens)}") 
+    #print(f"DEBUG MATCHER: JD Keyword tokens count: {len(jd_keyword_tokens)}") 
+    #print(f"DEBUG MATCHER: Resume Keyword tokens count: {len(resume_keyword_tokens)}") 
 
 
     matching_keyword_tokens = jd_keyword_tokens.intersection(resume_keyword_tokens)
     matching_keywords = sorted(list(matching_keyword_tokens))
 
-    print(f"DEBUG MATCHER: Matching keyword tokens count: {len(matching_keywords)}") 
-    print(f"DEBUG MATCHER: Matching keywords: {matching_keywords}")
+    #print(f"DEBUG MATCHER: Matching keyword tokens count: {len(matching_keywords)}") 
+    #print(f"DEBUG MATCHER: Matching keywords: {matching_keywords}")
 
     total_jd_keywords_count = len(jd_keyword_tokens)
     matching_keywords_count = len(matching_keywords)
@@ -161,7 +161,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     else:
         keyword_score = 1.0
 
-    print(f"DEBUG MATCHER: Keyword Score: {keyword_score}")
+    #print(f"DEBUG MATCHER: Keyword Score: {keyword_score}")
 
 
     #---Final Score Logic---
