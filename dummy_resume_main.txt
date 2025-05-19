@@ -1,0 +1,7 @@
+John Doe
+Skills
+Python, Java
+Education
+B.Sc. in Computer Science 2020
+Experience
+Dev @ SomeCo - 2021 to Present

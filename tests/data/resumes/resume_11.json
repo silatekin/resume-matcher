@@ -1,0 +1,86 @@
+{
+    "summary_text": "Objective\nTo secure a challenging Customer Service position where my communication and problem-solving skills can contribute to customer satisfaction and company success.",
+    "skills": [
+        "CRM",
+        "Salesforce"
+    ],
+    "education_details": [
+        {
+            "degree_mention": "associate",
+            "institution_mention": null,
+            "date_mention": "2019",
+            "text": "Education\nAssociate of Arts in Business Administration\nCommunity College of Anytown, Anytown, ST, 2019"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "eve.a@jobmail.com"
+        ],
+        "phones": [
+            "5551112222"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Customer Service Lead",
+            "company": "ConnectAll Services",
+            "start_date": "2021-01-01",
+            "end_date": "2025-05-17",
+            "description": "- Supervised a team of 5 customer service representatives.\n- Handled escalated customer issues and provided solutions.\n- Developed training materials for new hires.\n- Achieved a 95% customer satisfaction rating in Q4 2023."
+        },
+        {
+            "job_title": null,
+            "company": "Customer Service Representative",
+            "start_date": "2019-01-01",
+            "end_date": "2021-01-01",
+            "description": "- Responded to customer inquiries via phone, email, and chat.\n- Resolved product and service issues efficiently.\n- Maintained detailed records of customer interactions."
+        }
+    ],
+    "total_years_experience": 6.4,
+    "education_level": 2,
+    "raw_entities": {
+        "PERSON": [
+            "Eve Adams",
+            "Q4 2023"
+        ],
+        "CARDINAL": [
+            "2019 - 2021",
+            "2021",
+            "5",
+            "555",
+            "60"
+        ],
+        "ORG": [
+            "Business Administration\nCommunity College",
+            "ConnectAll Services",
+            "Customer Service",
+            "Customer Service Representative",
+            "Salesforce",
+            "SupportNow Ltd.",
+            "Zendesk"
+        ],
+        "PERCENT": [
+            "95%"
+        ],
+        "GPE": [
+            "Anytown",
+            "ST"
+        ],
+        "NORP": [
+            "Anytown",
+            "French"
+        ],
+        "DATE": [
+            "2019"
+        ],
+        "LANGUAGE": [
+            "English"
+        ]
+    },
+    "companies": [
+        "ConnectAll Services",
+        "Customer Service Representative",
+        "SupportNow Ltd."
+    ],
+    "raw_text_snippet": "Eve Adams\neve.a@jobmail.com | 555-111-2222\nObjective\nTo secure a challenging Customer Service position where my communication and problem-solving skills can contribute to customer satisfaction and company success.\nExperience\nCustomer Service Lead | ConnectAll Services | Remote\n2021 - Present\n- Supervised a team of 5 customer service representatives.\n- Handled escalated customer issues and provided solutions.\n- Developed training materials for new hires.\n- Achieved a 95% customer satisfaction rating in Q4 2023.\nCustomer Service Representative | SupportNow Ltd. | Anytown, ST\n2019 - 2021\n- Responded to customer inquiries via phone, email, and chat.\n- Resolved product and service issues efficiently.\n- Maintained detailed records of customer int"
+}

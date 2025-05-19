@@ -1,0 +1,100 @@
+{
+    "summary_text": "Profile\nFriendly and engaging team player and leader able to inspire staff to perform their best. Detail oriented\nand experienced restaurant manager passionate about food and beverages. A multi-tasker who excels at\nstaff training and recruiting with a track record of inspiring great customer service and customer\nsatisfaction. Regularly exceed sales goals. A master in the art of upselling.",
+    "skills": [],
+    "education_details": [
+        {
+            "degree_mention": "BS IN BUSINESS",
+            "institution_mention": "BIGTOWN COLLEGE, CHICAGO",
+            "date_mention": "JUNE 2018",
+            "text": "B.S. IN BUSINESS ADMINISTRATION | JUNE 2018 | BIGTOWN COLLEGE, CHICAGO, ILLINOIS"
+        },
+        {
+            "degree_mention": "AA IN HOSPITALITY",
+            "institution_mention": "BIGTOWN COLLEGE, CHICAGO",
+            "date_mention": "JUNE 2014",
+            "text": "A.A. IN HOSPITALITY MANAGEMENT | JUNE 2014 | BIGTOWN COLLEGE, CHICAGO, ILLINOIS"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "m.riley@live.com"
+        ],
+        "phones": [
+            "7165550100"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "RESTAURANT MANAGER",
+            "company": "CONTOSO BAR AND GRILL",
+            "start_date": "2023-09-01",
+            "end_date": "2025-05-17",
+            "description": "\u00b7 Recruit, hire, train, and coach over 30 staff members on customer service skills, food & beverage"
+        },
+        {
+            "job_title": "RESTAURANT MANAGER",
+            "company": "FOURTH COFFEE BISTRO",
+            "start_date": "2020-06-01",
+            "end_date": "2022-08-01",
+            "description": "\u00b7 Created a cross-training program ensuring FOH staff members were able to perform confidently and\neffectively in all positions.\n\u00b7 Grew customer based and increased restaurant social media accounts by 19% through interactive\npromotions, engaging postings, and contests.\n\u00b7 Created and implemented staff health and safety standards compliance training program, achieving a"
+        }
+    ],
+    "total_years_experience": 3.9,
+    "education_level": 3,
+    "raw_entities": {
+        "PERSON": [
+            "Grew",
+            "Riley"
+        ],
+        "CARDINAL": [
+            "2022",
+            "30",
+            "4567",
+            "555",
+            "716"
+        ],
+        "FAC": [
+            "Main Street"
+        ],
+        "GPE": [
+            "A.A.",
+            "Buffalo",
+            "CHICAGO",
+            "ILLINOIS",
+            "New York"
+        ],
+        "DATE": [
+            "98052",
+            "JUNE 2014",
+            "JUNE 2018",
+            "JUNE 2020",
+            "SEPTEMBER",
+            "monthly"
+        ],
+        "ORG": [
+            "CONTOSO BAR",
+            "Education\nB.S.",
+            "FOH",
+            "Interests\nTheater",
+            "Recruit",
+            "Skills & Abilities",
+            "health & safety standards",
+            "the Board of Health"
+        ],
+        "PERCENT": [
+            "10%",
+            "19%",
+            "6%",
+            "7%",
+            "99%"
+        ],
+        "ORDINAL": [
+            "FOURTH"
+        ]
+    },
+    "companies": [
+        "CONTOSO BAR AND GRILL",
+        "FOURTH COFFEE BISTRO"
+    ],
+    "raw_text_snippet": "May Riley\n4567 Main Street, Buffalo, New York 98052 | (716) 555-0100 | m.riley@live.com | www.linkedin.com/in/m.riley\nProfile\nFriendly and engaging team player and leader able to inspire staff to perform their best. Detail oriented\nand experienced restaurant manager passionate about food and beverages. A multi-tasker who excels at\nstaff training and recruiting with a track record of inspiring great customer service and customer\nsatisfaction. Regularly exceed sales goals. A master in the art of upselling.\nExperience\nRESTAURANT MANAGER | CONTOSO BAR AND GRILL | SEPTEMBER 2023 \u2013 PRESENT\n\u00b7 Recruit, hire, train, and coach over 30 staff members on customer service skills, food & beverage\nknowledge, sales, and health & safety standards.\n\u00b7 Reduced "
+}

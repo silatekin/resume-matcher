@@ -1,4 +1,5 @@
 {
+    "summary_text": "Summary:\nData-driven analyst with expertise in Python, SQL, and Tableau.",
     "skills": [
         "Python",
         "SQL",
@@ -7,8 +8,8 @@
     "education_details": [
         {
             "degree_mention": "bs",
-            "institution_mention": "State University (2018",
-            "date_mention": null,
+            "institution_mention": "State University",
+            "date_mention": "2018",
             "text": "Education: B.S. in Statistics, State University (2018)"
         }
     ],
@@ -25,8 +26,8 @@
             "job_title": "Data Analyst",
             "company": "DataInsights",
             "start_date": "2020-01-01",
-            "end_date": "2025-05-04",
-            "description": "Built predictive models using Python and scikit-learn.\nAutomated reports, saving 10+ hours per week."
+            "end_date": "2025-05-17",
+            "description": ""
         },
         {
             "job_title": "Business Analyst",
@@ -36,11 +37,43 @@
             "description": ""
         }
     ],
-    "total_years_experience": 7.3,
+    "total_years_experience": 7.4,
     "education_level": 3,
-    "raw_entities": {},
+    "raw_entities": {
+        "PERSON": [
+            "David Kim\nEmail"
+        ],
+        "CARDINAL": [
+            "2018–2020",
+            "456",
+            "555"
+        ],
+        "ORG": [
+            "DataInsights",
+            "FinCorp",
+            "Python",
+            "SQL",
+            "State University (2018"
+        ],
+        "GPE": [
+            "B.S.",
+            "Statistics",
+            "Tableau"
+        ],
+        "DATE": [
+            "2020"
+        ],
+        "TIME": [
+            "10+ hours"
+        ],
+        "PRODUCT": [
+            "Excel"
+        ]
+    },
     "companies": [
         "DataInsights",
-        "FinCorp"
-    ]
+        "FinCorp",
+        "Python"
+    ],
+    "raw_text_snippet": "Data Analyst\nName: David Kim\nEmail: david.kim@email.com | Phone: (555) 456-7890\nLinkedIn: linkedin.com/in/davidkim\nSummary:\nData-driven analyst with expertise in Python, SQL, and Tableau.\nExperience:\nData Analyst, DataInsights (2020–Present)\nBuilt predictive models using Python and scikit-learn.\nAutomated reports, saving 10+ hours per week.\nBusiness Analyst, FinCorp (2018–2020)\nAnalyzed customer trends to improve retention.\nSkills: Python, SQL, Tableau, Excel\nEducation: B.S. in Statistics, State University (2018)"
 }

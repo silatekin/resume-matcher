@@ -1,9 +1,10 @@
 {
+    "summary_text": "Summary:\nCompassionate RN with 6+ years of experience in critical care.",
     "skills": [],
     "education_details": [
         {
             "degree_mention": "college",
-            "institution_mention": "BSN",
+            "institution_mention": null,
             "date_mention": "2016",
             "text": "BSN, Nursing College (2016)"
         }
@@ -18,10 +19,10 @@
     },
     "experience": [
         {
-            "job_title": "Experience",
+            "job_title": null,
             "company": "ICU Nurse",
             "start_date": "2019-01-01",
-            "end_date": "2025-05-04",
+            "end_date": "2025-05-17",
             "description": "Monitored critically ill patients and assisted in life-saving procedures."
         },
         {
@@ -32,11 +33,35 @@
             "description": ""
         }
     ],
-    "total_years_experience": 9.3,
+    "total_years_experience": 9.4,
     "education_level": 1,
-    "raw_entities": {},
+    "raw_entities": {
+        "PERSON": [
+            "Emily Carter\nEmail",
+            "Nurse"
+        ],
+        "CARDINAL": [
+            "2016–2019",
+            "555",
+            "789"
+        ],
+        "DATE": [
+            "2016",
+            "2019",
+            "6+ years"
+        ],
+        "ORG": [
+            "BSN",
+            "City Hospital",
+            "Community Clinic",
+            "EHR Systems",
+            "ICU Nurse",
+            "Nursing College"
+        ]
+    },
     "companies": [
         "Community Clinic",
         "ICU Nurse"
-    ]
+    ],
+    "raw_text_snippet": "Registered Nurse\nName: Emily Carter\nEmail: emily.carter@email.com | Phone: (555) 789-0123\nLinkedIn: linkedin.com/in/emilycarter\nSummary:\nCompassionate RN with 6+ years of experience in critical care.\nExperience:\nICU Nurse, City Hospital (2019–Present)\nMonitored critically ill patients and assisted in life-saving procedures.\nStaff Nurse, Community Clinic (2016–2019)\nProvided primary care and patient education.\nSkills: Patient Care, Emergency Response, EHR Systems\nEducation: BSN, Nursing College (2016)"
 }

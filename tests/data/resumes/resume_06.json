@@ -1,10 +1,11 @@
 {
+    "summary_text": "Summary:\nFinance professional with expertise in investment analysis and financial modeling.",
     "skills": [],
     "education_details": [
         {
             "degree_mention": "bs",
             "institution_mention": "Business School",
-            "date_mention": null,
+            "date_mention": "2019",
             "text": "Education: B.S. in Finance, Business School (2019)"
         }
     ],
@@ -21,7 +22,7 @@
             "job_title": "Financial Analyst",
             "company": "Capital Investments",
             "start_date": "2021-01-01",
-            "end_date": "2025-05-04",
+            "end_date": "2025-05-17",
             "description": ""
         },
         {
@@ -29,15 +30,40 @@
             "company": "WealthBank",
             "start_date": "2019-01-01",
             "end_date": "2021-01-01",
-            "description": "Assisted in portfolio management."
+            "description": ""
         }
     ],
-    "total_years_experience": 6.3,
+    "total_years_experience": 6.4,
     "education_level": 3,
-    "raw_entities": {},
+    "raw_entities": {
+        "PERSON": [
+            "Rachel Lee\nEmail"
+        ],
+        "CARDINAL": [
+            "2019–2021",
+            "2021",
+            "345-6789",
+            "555"
+        ],
+        "ORG": [
+            "Assisted",
+            "Bloomberg Terminal",
+            "Business School",
+            "Capital Investments",
+            "Financial Modeling",
+            "WealthBank"
+        ],
+        "PRODUCT": [
+            "Excel"
+        ],
+        "GPE": [
+            "B.S."
+        ]
+    },
     "companies": [
         "Assisted",
         "Capital Investments",
         "WealthBank"
-    ]
+    ],
+    "raw_text_snippet": "Financial Analyst\nName: Rachel Lee\nEmail: rachel.lee@email.com | Phone: (555) 345-6789\nSummary:\nFinance professional with expertise in investment analysis and financial modeling.\nExperience:\nFinancial Analyst, Capital Investments (2021–Present)\nBuilt valuation models for M&A deals.\nInvestment Intern, WealthBank (2019–2021)\nAssisted in portfolio management.\nSkills: Excel, Financial Modeling, Bloomberg Terminal\nEducation: B.S. in Finance, Business School (2019)"
 }

@@ -1,12 +1,13 @@
 {
+    "summary_text": "Summary:\nTop-performing sales rep with a track record of exceeding targets.",
     "skills": [
         "CRM"
     ],
     "education_details": [
         {
-            "degree_mention": "ba",
-            "institution_mention": "State College (2018",
-            "date_mention": null,
+            "degree_mention": "college",
+            "institution_mention": null,
+            "date_mention": "2018",
             "text": "Education: B.A. in Business, State College (2018)"
         }
     ],
@@ -20,24 +21,50 @@
     },
     "experience": [
         {
-            "job_title": "Experience",
+            "job_title": null,
             "company": "Sales Rep",
             "start_date": "2020-01-01",
-            "end_date": "2025-05-04",
+            "end_date": "2025-05-17",
             "description": ""
         },
         {
-            "job_title": "Closed $500K in annual deals.",
+            "job_title": "Account Executive, SalesCo (",
             "company": null,
             "start_date": "2018-01-01",
             "end_date": "2020-01-01",
             "description": ""
         }
     ],
-    "total_years_experience": 7.3,
+    "total_years_experience": 7.4,
     "education_level": 3,
-    "raw_entities": {},
+    "raw_entities": {
+        "PERSON": [
+            "Olivia Green\nEmail",
+            "SalesCo"
+        ],
+        "CARDINAL": [
+            "2018–2020",
+            "555",
+            "678-9012"
+        ],
+        "ORG": [
+            "Sales Rep",
+            "State College (2018",
+            "TechSales Inc."
+        ],
+        "DATE": [
+            "2020",
+            "annual"
+        ],
+        "MONEY": [
+            "$500K"
+        ],
+        "PRODUCT": [
+            "CRM"
+        ]
+    },
     "companies": [
         "Sales Rep"
-    ]
+    ],
+    "raw_text_snippet": "Sales Representative\nName: Olivia Green\nEmail: olivia.green@email.com | Phone: (555) 678-9012\nSummary:\nTop-performing sales rep with a track record of exceeding targets.\nExperience:\nSales Rep, TechSales Inc. (2020–Present)\nClosed $500K in annual deals.\nAccount Executive, SalesCo (2018–2020)\nSkills: CRM, Negotiation, Cold Calling\nEducation: B.A. in Business, State College (2018)"
 }

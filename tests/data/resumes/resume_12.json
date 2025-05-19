@@ -1,0 +1,118 @@
+{
+    "summary_text": "Summary\nHighly motivated and results-oriented Software Developer with 5+ years of experience in developing, testing, and deploying web applications. Proficient in Python, Java, and JavaScript frameworks. Seeking to leverage strong technical skills and problem-solving abilities to contribute to innovative projects.",
+    "skills": [
+        "AWS",
+        "Agile",
+        "Angular",
+        "C++",
+        "Django",
+        "Docker",
+        "Flask",
+        "Git",
+        "Java",
+        "JavaScript",
+        "Jenkins",
+        "Jira",
+        "MongoDB",
+        "MySQL",
+        "Node.js",
+        "PostgreSQL",
+        "Python",
+        "React",
+        "SQL",
+        "Spring"
+    ],
+    "education_details": [
+        {
+            "degree_mention": "master",
+            "institution_mention": "State University",
+            "date_mention": "2018",
+            "text": "Education\nMaster of Science in Computer Science | State University | Anytown, USA | 2018\n-"
+        },
+        {
+            "degree_mention": "bachelor",
+            "institution_mention": null,
+            "date_mention": "2016",
+            "text": "Thesis: \"Machine Learning for Anomaly Detection\"\nBachelor of Science in Information Technology | City College | Anytown, USA | 2016"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "john.doe@email.com"
+        ],
+        "phones": [
+            "5551234567"
+        ]
+    },
+    "experience": [
+        {
+            "job_title": "Software Developer",
+            "company": "Tech Solutions Inc.",
+            "start_date": "2020-01-01",
+            "end_date": "2025-05-17",
+            "description": "- Developed and maintained scalable web applications using Python (Django) and React.\n- Collaborated with cross-functional teams to define project requirements and deliver solutions.\n- Improved application performance by 15% through code optimization and database tuning.\n- Led a team of 3 junior developers on a critical feature deployment.\n- Technologies used: Python, Django, JavaScript, React, PostgreSQL, Docker, AWS."
+        },
+        {
+            "job_title": "Junior Software Developer | Web Innovators LLC | Anytown, USA |",
+            "company": null,
+            "start_date": "2018-06-01",
+            "end_date": "2019-12-01",
+            "description": "- Assisted in the development of client-facing websites using HTML, CSS, and JavaScript.\n- Participated in code reviews and contributed to a collaborative team environment.\n- Fixed bugs and implemented new features based on user feedback."
+        }
+    ],
+    "total_years_experience": 6.9,
+    "education_level": 4,
+    "raw_entities": {
+        "PERSON": [
+            "Django",
+            "Docker",
+            "Java",
+            "Jenkins",
+            "John Michael Doe\njohn.doe@email.com"
+        ],
+        "CARDINAL": [
+            "123",
+            "3",
+            "555"
+        ],
+        "DATE": [
+            "2016",
+            "2018",
+            "5+ years",
+            "Dec 2019",
+            "Jan 2020",
+            "Jun 2018"
+        ],
+        "ORG": [
+            "Angular",
+            "HTML",
+            "JavaScript",
+            "Python",
+            "State University",
+            "Tech Solutions Inc."
+        ],
+        "GPE": [
+            "Anytown",
+            "Flask",
+            "React",
+            "USA"
+        ],
+        "PERCENT": [
+            "15%"
+        ],
+        "WORK_OF_ART": [
+            "Machine Learning for Anomaly Detection",
+            "Spring Boot, React"
+        ],
+        "FAC": [
+            "City College"
+        ],
+        "NORP": [
+            "C++"
+        ]
+    },
+    "companies": [
+        "Tech Solutions Inc."
+    ],
+    "raw_text_snippet": "John Michael Doe\njohn.doe@email.com | (555) 123-4567 | linkedin.com/in/johndoe | github.com/johndoe\nSummary\nHighly motivated and results-oriented Software Developer with 5+ years of experience in developing, testing, and deploying web applications. Proficient in Python, Java, and JavaScript frameworks. Seeking to leverage strong technical skills and problem-solving abilities to contribute to innovative projects.\nExperience\nSoftware Developer | Tech Solutions Inc. | Anytown, USA | Jan 2020 – Present\n- Developed and maintained scalable web applications using Python (Django) and React.\n- Collaborated with cross-functional teams to define project requirements and deliver solutions.\n- Improved application performance by 15% through code optimiza"
+}

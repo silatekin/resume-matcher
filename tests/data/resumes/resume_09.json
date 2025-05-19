@@ -1,10 +1,11 @@
 {
+    "summary_text": "Summary:\nHR professional specializing in recruitment and employee relations.",
     "skills": [],
     "education_details": [
         {
             "degree_mention": "ba",
-            "institution_mention": "Human Resources, Business University",
-            "date_mention": null,
+            "institution_mention": null,
+            "date_mention": "2017",
             "text": "Education: B.A. in Human Resources, Business University (2017)"
         }
     ],
@@ -21,21 +22,42 @@
             "job_title": "HR Specialist",
             "company": "PeopleFirst",
             "start_date": "2019-01-01",
-            "end_date": "2025-05-04",
+            "end_date": "2025-05-17",
             "description": ""
         },
         {
-            "job_title": "Reduced hiring time",
+            "job_title": "HR Assistant, Staffing Solutions (",
             "company": null,
             "start_date": "2017-01-01",
             "end_date": "2019-01-01",
             "description": ""
         }
     ],
-    "total_years_experience": 8.3,
+    "total_years_experience": 8.4,
     "education_level": 3,
-    "raw_entities": {},
+    "raw_entities": {
+        "PERSON": [
+            "Daniel Park\nEmail"
+        ],
+        "CARDINAL": [
+            "2017–2019",
+            "555",
+            "890"
+        ],
+        "ORG": [
+            "HRIS",
+            "Human Resources, Business University",
+            "PeopleFirst"
+        ],
+        "DATE": [
+            "2019"
+        ],
+        "PERCENT": [
+            "25%"
+        ]
+    },
     "companies": [
         "PeopleFirst"
-    ]
+    ],
+    "raw_text_snippet": "HR Specialist\nName: Daniel Park\nEmail: daniel.park@email.com | Phone: (555) 890-1234\nSummary:\nHR professional specializing in recruitment and employee relations.\nExperience:\nHR Specialist, PeopleFirst (2019–Present)\nReduced hiring time by 25%.\nHR Assistant, Staffing Solutions (2017–2019)\nSkills: Recruitment, Employee Engagement, HRIS\nEducation: B.A. in Human Resources, Business University (2017)"
 }

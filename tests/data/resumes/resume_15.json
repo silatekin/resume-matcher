@@ -1,0 +1,94 @@
+{
+    "summary_text": null,
+    "skills": [
+        "Data Analysis",
+        "Git",
+        "Machine Learning",
+        "MySQL",
+        "NumPy",
+        "Pandas",
+        "PostgreSQL",
+        "Power BI",
+        "Python",
+        "R",
+        "SQL",
+        "Scikit-learn",
+        "Tableau"
+    ],
+    "education_details": [
+        {
+            "degree_mention": "master",
+            "institution_mention": "IL\nGraduation",
+            "date_mention": null,
+            "text": "Education\nMaster of Science in Data Science\nNorthwestern University, Evanston, IL\nGraduation:"
+        },
+        {
+            "degree_mention": "bachelor",
+            "institution_mention": "IL\nGraduation",
+            "date_mention": "May 2020",
+            "text": "May 2020\nBachelor of Arts in Economics\nUniversity of Illinois Urbana-Champaign, Urbana, IL\nGraduation:"
+        },
+        {
+            "degree_mention": null,
+            "institution_mention": null,
+            "date_mention": "Dec 2017",
+            "text": "Dec 2017"
+        }
+    ],
+    "contact_info": {
+        "emails": [
+            "c.danvers.stats@protonmail.com"
+        ]
+    },
+    "experience": [],
+    "total_years_experience": 0.0,
+    "education_level": 4,
+    "raw_entities": {
+        "PERSON": [
+            "Carol Danvers",
+            "Git",
+            "Jupyter Notebooks",
+            "Seaborn"
+        ],
+        "ORG": [
+            "Bachelor of Arts in Economics\nUniversity of Illinois Urbana-Champaign",
+            "IL\nGraduation",
+            "IL\nStart Date:",
+            "IL\nStart Date: 07/2020",
+            "Numbers Inc.",
+            "Power BI\n- Statistical Modeling: Regression Analysis",
+            "Quantify Corp",
+            "SQL",
+            "Scikit",
+            "Skills Summary\n- Data Analysis & Visualization: Python",
+            "Time Series Forecasting"
+        ],
+        "PRODUCT": [
+            "Matplotlib",
+            "Server"
+        ],
+        "GPE": [
+            "Chicago",
+            "Evanston",
+            "Tableau",
+            "Urbana"
+        ],
+        "MONEY": [
+            "50k"
+        ],
+        "DATE": [
+            "Dec 2017",
+            "May 2020",
+            "annually"
+        ],
+        "CARDINAL": [
+            "01/2022"
+        ]
+    },
+    "companies": [
+        "IL",
+        "Numbers Inc.",
+        "Quantify Corp"
+    ],
+    "raw_text_snippet": "Carol Danvers\nc.danvers.stats@protonmail.com\nSkills Summary\n- Data Analysis & Visualization: Python (Pandas, NumPy, Matplotlib, Seaborn), R, SQL, Tableau, Power BI\n- Statistical Modeling: Regression Analysis, Time Series Forecasting, Hypothesis Testing\n- Machine Learning (Basic): Scikit-learn\n- Databases: MySQL, PostgreSQL, SQL Server\n- Tools: Excel (Advanced), Jupyter Notebooks, Git\nExperience\nData Analyst | Quantify Corp | Chicago, IL\nStart Date: 02/2022 End Date: Present\n- Perform data extraction, cleaning, and analysis to identify key business insights.\n- Develop dashboards and reports to visualize data and communicate findings to stakeholders.\n- Contributed to a project that identified operational inefficiencies, saving the company $50"
+}

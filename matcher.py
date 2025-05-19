@@ -2,10 +2,6 @@ import math
 import logging
 import string
 
-#TODO
-#Add Job Title Matching:
-#Add Keyword Matching:
-
 def clean_and_tokenize(text):
     """
     Lowercases, removes punctuation, splits into words.
@@ -40,7 +36,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     if(len(jd_skills_set)) > 0:
         skill_score=len(matching_skills_set)/len(jd_skills_set)
     else:
-        skill_score = 1.0 #if jd lists have no skills
+        skill_score = 0.0 #if jd lists have no skills
 
     #---Experience Years Matching---
     resume_experience_years = parsed_resume.get('total_years_experience',0)
@@ -77,33 +73,48 @@ def calculate_match_score(parsed_resume,parsed_jd):
         education_score = 0.0
         logging.info(f"Resume level ({resume_edu_level}) is below requirement ({jd_edu_level}).")
 
-    # ---Job Title Matching---
+
+
+    # Job Title Matchin
     jd_title = parsed_jd.get('job_title', '')
     resume_experience = parsed_resume.get('experience', [])
 
-    jd_tokens = clean_and_tokenize(jd_title)
-    #print(f"DEBUG MATCHER: JD Title tokens: {jd_tokens}")
+    if not jd_title.strip():
+            title_score = 1.0 #we say perfect match here but?? debatable
+    else:
+        jd_tokens = clean_and_tokenize(jd_title)
+        #print(f"DEBUG MATCHER: JD Title tokens: {jd_tokens}")
 
-    title_score = 0.0
-    matching_resume_titles = []
-    all_resume_titles_checked = [entry.get('job_title') if entry.get('job_title') is not None else '' for entry in resume_experience]
+        max_title_score = 0.0
+        matching_resume_titles = []
+        all_resume_titles_checked = [entry.get('job_title') if entry.get('job_title') is not None else '' for entry in resume_experience]
 
-    if jd_tokens:
-        for entry in resume_experience:
-            resume_title = entry.get('job_title')
-            
-            if resume_title:
-                resume_tokens = clean_and_tokenize(resume_title)
-                #print(f"DEBUG MATCHER: Checking resume title '{resume_title}' tokens: {resume_tokens}")
+        if jd_tokens:
+            for entry in resume_experience:
+                resume_title = entry.get('job_title')
+                
+                if resume_title:
+                    resume_tokens = clean_and_tokenize(resume_title)
+                    #print(f"DEBUG MATCHER: Checking resume title '{resume_title}' tokens: {resume_tokens}")
+                    
+                    if resume_tokens:
+                        common_tokens = jd_tokens.intersection(resume_tokens)
+                        union_tokens = jd_tokens.union(resume_tokens)
+                        #print(f"DEBUG MATCHER: Common tokens: {common_tokens}")
 
-                common_tokens = jd_tokens.intersection(resume_tokens)
-                #print(f"DEBUG MATCHER: Common tokens: {common_tokens}")
+                        current_jaccard_score = 0.0
 
-                if any(len(token)>1 for token in common_tokens):
-                    title_score = 1.0
-                    if resume_title not in matching_resume_titles:
-                        matching_resume_titles.append(resume_title)
-                    break
+                        if union_tokens:
+                            current_jaccard_score = len(common_tokens) / len(union_tokens)
+                        
+                        if current_jaccard_score > max_title_score:
+                            max_title_score = current_jaccard_score
+                            matching_resume_titles = [resume_title] 
+                        elif current_jaccard_score == max_title_score and max_title_score > 0: # If equal to current max and not zero
+                            if resume_title not in matching_resume_titles:
+                                matching_resume_titles.append(resume_title)
+
+        title_score = max_title_score
     #print(f"DEBUG MATCHER: Job Title Score: {title_score}")
 
     #---Keyword Matching---
@@ -159,7 +170,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     if total_jd_keywords_count > 0:
         keyword_score = matching_keywords_count / total_jd_keywords_count
     else:
-        keyword_score = 1.0
+        keyword_score = 0.0
 
     #print(f"DEBUG MATCHER: Keyword Score: {keyword_score}")
 
@@ -174,6 +185,7 @@ def calculate_match_score(parsed_resume,parsed_jd):
     final_score = (skill_score * skill_weight) + (experience_score * experience_weight) + \
                  (education_score * education_weight) + (title_score * title_weight)+ \
                  (keyword_score * keyword_weight)
+                 
     
     results = {
         'score':final_score,
