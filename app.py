@@ -1,265 +1,312 @@
 import streamlit as st
-from resume_parser import process_streamlit_file
-from resume_parser import EDUCATION_LEVELS
 from matcher import calculate_match_score
 from load_job_descriptions import load_all_job_descriptions_from_folder
 import os
+import spacy
+import logging 
+from resume_parser_copy import (
+    process_streamlit_file,
+    load_skills,
+    SECTION_HEADERS_GLOBAL,
+    EDUCATION_LEVELS_GLOBAL
+)
 
-# parsed_resume = {
-#     "skills": [],  # DONE
-#     "education_details": [  #DONE
-#      {
-#       "degree_mention": degree_mention,     # bachelor", "msc" (from EDUCATION_LEVELS keys)
-#       "institution_mention": institution_mention, # "Stanford University" (from NER ORG)
-#       "date_mention": date_mention,         # e."2018" (from NER DATE)
-#       "text": sent.text.strip()             
-#      } ],
-#     "contact_info": {},  # MOSTLY DONE BUT MAYBE ADD NAME EXTRACTION?
-#     "experience": [], # DONE
-#     "total_years_experience": 0.0, # DONE
-#     "education_level": -1, # DONE
-#     "companies": [],
-# }
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
+
 
 APP_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-JOB_DATA_FOLDER_PATH = os.path.join(APP_BASE_DIR,"tests","data", "job_descriptions")
-
-def get_cached_job_data(path_to_jobs_folder):
-    print(f"APP.PY: Cache miss or first run. Calling load_all_job_descriptions_from_folder with path: {path_to_jobs_folder}")
-    return load_all_job_descriptions_from_folder(path_to_jobs_folder)
+JOB_DATA_FOLDER_PATH = os.path.join(APP_BASE_DIR, "tests", "data", "job_descriptions")
+SKILLS_JSON_PATH_FOR_RESUME_PARSER = os.path.join(APP_BASE_DIR, "tests", "data", "skills.json")
 
 
-DUMMY_JOBS = get_cached_job_data(JOB_DATA_FOLDER_PATH)
+# --- Data Loading Functions from original app_copy.py (with logging) ---
+# Note: The original get_cached_job_data didn't use streamlit caching.
+# DUMMY_JOBS are loaded once per script run.
+# If load_all_job_descriptions_from_folder is very slow, it could be cached with @st.cache_data
+def get_job_data_from_dummy_folder(path_to_jobs_folder):
+    logging.info(f"APP.PY: Attempting to load DUMMY job descriptions from: {path_to_jobs_folder}")
+    try:
+        jobs = load_all_job_descriptions_from_folder(path_to_jobs_folder)
+        if jobs:
+            logging.info(f"Successfully loaded {len(jobs)} DUMMY job descriptions from {path_to_jobs_folder}")
+        else:
+            logging.warning(f"No DUMMY job descriptions found or loaded from {path_to_jobs_folder}")
+        return jobs
+    except Exception as e:
+        st.error(f"ERROR: Failed to load DUMMY job descriptions from {path_to_jobs_folder}: {e}")
+        logging.error(f"Failed to load DUMMY job descriptions: {e}")
+        return []
+
+DUMMY_JOBS = get_job_data_from_dummy_folder(JOB_DATA_FOLDER_PATH)
 
 if not DUMMY_JOBS:
-    st.error("Failed to load job descriptions. Job matching will be unavailable.")
+    st.warning("Job descriptions (DUMMY_JOBS) are empty or could not be loaded. Matching will be unavailable or limited.")
+
+@st.cache_resource
+def get_nlp_model():
+    try:
+        model = spacy.load("en_core_web_md")
+        logging.info("NLP model loaded for app.")
+        return model
+    except OSError:
+        st.error("App Error: Spacy model 'en_core_web_md' not found. Please download it: python -m spacy download en_core_web_md")
+        logging.error("Spacy model 'en_core_web_md' not found.")
+        return None
+
+@st.cache_data
+def get_skills_data_for_resume_parser_cached(skill_file_path=None):
+    skill_list = load_skills(skill_file_path) 
+    skill_set = set(skill_list) 
+    logging.info(f"Loaded {len(skill_list)} skills, created set of {len(skill_set)} skills for resume parser from {skill_file_path}.")
+    return skill_list, skill_set
 
 
-st.title("Resume to Job Matcher")
-st.write("Upload your resume to find suitable job openings.")
+NLP_MODEL = get_nlp_model()
+TECH_SKILLS_LIST_APP, TECH_SKILLS_SET_APP = get_skills_data_for_resume_parser_cached(SKILLS_JSON_PATH_FOR_RESUME_PARSER)
 
-uploaded_file = st.file_uploader("Choose a resume file (TXT, DOCX, PDF)", type=['txt', 'docx', 'pdf'])
+
+
+st.title("🎯 Resume to Job Matcher") 
+st.write("Upload your resume (TXT, DOCX, PDF) to find suitable job openings from our database.")
+
+uploaded_file = st.file_uploader("Choose a resume file", type=['txt', 'docx', 'pdf'])
 
 if uploaded_file is not None:
     st.markdown("---")
     st.write(f"Uploaded file: **{uploaded_file.name}** (Type: {uploaded_file.type})")
 
-    with st.spinner(f"Processing {uploaded_file.name} with our Resume Parser..."):
+    if NLP_MODEL is None:
+        st.error("NLP model could not be loaded. Cannot process resume.")
+    elif calculate_match_score is None: 
+        st.error("Job matcher component is not available. Cannot perform matching.")
+    else:
+        with st.spinner(f"Processing {uploaded_file.name}..."):
+            parsed_resume_data = process_streamlit_file(
+                uploaded_file,
+                NLP_MODEL,
+                TECH_SKILLS_LIST_APP,
+                TECH_SKILLS_SET_APP,
+                SECTION_HEADERS_GLOBAL,
+                EDUCATION_LEVELS_GLOBAL
+            )
+
+            if parsed_resume_data:
+                st.session_state.parsed_resume_data = parsed_resume_data
+                processing_successful = True
+            else:
+                st.error("Failed to process the resume. Parser returned no data or an error occurred.")
+                processing_successful = False
+                if 'parsed_resume_data' in st.session_state:
+                    del st.session_state.parsed_resume_data
         
-        parsed_data = process_streamlit_file(uploaded_file)
+        if processing_successful and 'parsed_resume_data' in st.session_state:
+            st.success("✅ Resume processed successfully!") 
+            
+            data_to_display_resume = st.session_state.parsed_resume_data
+            
+            st.markdown("---")
+            st.subheader("📄 Your Parsed Resume Information:") 
 
-        if parsed_data:
-            st.session_state.parsed_resume_data = parsed_data
-            processing_successful = True
+            if "summary_text" in data_to_display_resume and data_to_display_resume["summary_text"]:
+                with st.expander("**Summary**", expanded=False): 
+                    st.markdown(data_to_display_resume["summary_text"])
 
-        else:
-            st.error("Failed to process the resume. The parser returned no data or an error occurred.")
-            processing_successful = False
-            if 'parsed_resume_data' in st.session_state:
-                del st.session_state.parsed_resume_data
-    
-    if processing_successful and 'parsed_resume_data' in st.session_state:
-        st.success("Resume processed successfully by our system!")
-        data_to_display = st.session_state.parsed_resume_data
-        
-        st.markdown("---")
+            if "experience" in data_to_display_resume and data_to_display_resume["experience"]:
+                st.write("**Work Experience:**")
+                for i, experience_entry in enumerate(data_to_display_resume["experience"]):
+                    title_from_parser = experience_entry.get("job_title")
+                    company_from_parser = experience_entry.get("company")
+                    display_job_title = str(title_from_parser) if title_from_parser is not None and str(title_from_parser).strip() else "Role Not Specified"
+                    display_company = str(company_from_parser) if company_from_parser is not None and str(company_from_parser).strip() else "Company Not Specified"
 
-        st.subheader("Parsed Resume Information (from your `resume_parser`):")
-
-        data_to_display = st.session_state.parsed_resume_data
-
-        if "experience" in data_to_display and data_to_display["experience"]:
-            st.write("**Work Experience:**")
-            for experience_entry in data_to_display["experience"]:
-                title = experience_entry.get("job_title","N/A")
-                company = experience_entry.get("company","N/A")
-
-                with st.expander(f"{title} at {company}"):
-                    start_date = experience_entry.get("start_date", "N/A") 
-                    end_date = experience_entry.get("end_date", "N/A")     
-                    st.markdown(f"**Dates:** {start_date} - {end_date}")
-
-                    description = experience_entry.get("description","No description provided.")
-
-                    if description:
-                        st.markdown("**Description:**")
-                        for desc_line in description.split('\n'):
-                            st.markdown(f"- {desc_line.strip()}")
+                    if display_job_title != "Role Not Specified" and display_company != "Company Not Specified":
+                        expander_label = f"{display_job_title} at {display_company}"
+                    elif display_job_title != "Role Not Specified":
+                        expander_label = display_job_title
+                    elif display_company != "Company Not Specified":
+                        expander_label = f"Role at {display_company}"
                     else:
-                        st.markdown("No description provided.")
-        else:
-            st.write("**Work Experience:** Not found or empty.")
-
-        if "total_years_experience" in data_to_display:
-            years_exp = data_to_display["total_years_experience"]
-
-            if isinstance(years_exp,(int,float)) and years_exp>=0:
-                st.write(f"**Total Calculated Years of Experience:** {years_exp:.1f} years")
-            elif years_exp:
-                st.write(f"**Total Calculated Years of Experience:** {years_exp}")
+                        expander_label = f"Experience Entry {i+1}"
+                    
+                    with st.expander(expander_label): # UI change
+                        st.markdown(f"**Job Title:** {str(title_from_parser) if title_from_parser is not None else 'Not Specified'}")
+                        st.markdown(f"**Company:** {str(company_from_parser) if company_from_parser is not None else 'Not Specified'}")
+                        start_date = experience_entry.get("start_date", "N/A") 
+                        end_date = experience_entry.get("end_date", "N/A")     
+                        st.markdown(f"**Dates:** {start_date} - {end_date}")
+                        description = experience_entry.get("description")
+                        if description and str(description).strip():
+                            st.markdown("**Description:**")
+                            for desc_line in str(description).split('\n'):
+                                st.markdown(f"- {desc_line.strip()}")
+                        else:
+                            st.markdown("**Description:** No description provided.")
             else:
-               st.write("**Total Calculated Years of Experience:** Not calculated or N/A")
-        
-
-        if "companies" in data_to_display and data_to_display["companies"]:
-            st.write("**Companies Mentioned in Experience:**")
-
-            for company_name in data_to_display["companies"]:
-               st.markdown(f"- {company_name}")
-        else: 
-            st.write("**Companies Mentioned in Experience:** None listed or found.")
-
-
-        if "contact_info" in data_to_display and data_to_display["contact_info"]:
-            st.write("**Contact Information:**")
-            contact = data_to_display["contact_info"]
-
-            if "emails" in contact and contact["emails"]:
-                st.write(f"- Email(s): {', '.join(contact['emails'])}")
-            
-            if "phones" in contact and contact["phones"]:
-                st.write(f"- Phone(s): {', '.join(contact['phones'])}")
-
-        else:
-            st.write("**Contact Information:** Not found")
+                st.write("**Work Experience:** Not found or empty in parsed resume data.") # UI change
             
 
-        if "skills" in data_to_display and data_to_display["skills"]:
-            st.write("**Skills:**")
-            for skill in data_to_display["skills"]:
-                st.markdown(f"- {skill}")
+            if "total_years_experience" in data_to_display_resume:
+                years_exp = data_to_display_resume["total_years_experience"]
+                if isinstance(years_exp, (int, float)) and years_exp >= 0:
+                    st.write(f"**Total Calculated Years of Experience:** {years_exp:.1f} years")
 
-        if "education_details" in data_to_display and data_to_display["education_details"]:
-            st.write("**Education:**") 
-
-            #st.write("DEBUG: Content of data_to_display['education_details']:", data_to_display["education_details"])
-
-            for edu_entry in data_to_display["education_details"]:
-                st.write(f"DEBUG: Processing edu_entry: {edu_entry}")
-
-                degree = edu_entry.get("degree_mention", "")
-                institution = edu_entry.get("institution_mention", "Institution N/A")
-
-                display_degree = degree.upper() if degree and degree in EDUCATION_LEVELS else degree.capitalize() if degree else "Degree N/A"
-        
-                expander_title = f"{display_degree} - {institution}"
-                if expander_title == "Degree N/A - Institution N/A": 
-                    expander_title = edu_entry.get('text', 'Education Entry Details')
-        
-                with st.expander(expander_title):
-                    st.markdown(f"**Degree Mention (Keyword):** {edu_entry.get('degree_mention', 'N/A')}")
-                    st.markdown(f"**Institution Mention (NER):** {edu_entry.get('institution_mention', 'N/A')}")
-                    st.markdown(f"**Date Mention (NER):** {edu_entry.get('date_mention', 'N/A')}")
-                    st.markdown(f"**Original Text:** {edu_entry.get('text', 'N/A')}")
-        else:
-            st.write("**Education:** Not found or empty.")
-
-        
-        if "education_level" in data_to_display:
-            level_num = data_to_display["education_level"]
-            if level_num != -1:
-                level_description = f"Level {level_num}"
-                st.write(f"**Highest Education Level (Parsed):** {level_description}")
-            else:
-                st.write("**Highest Education Level (Parsed):** Not determined.")
-
-        with st.expander("View Raw Extracted Text Snippet:"):
-            st.text_area("raw_text_display", 
-                         data_to_display.get("raw_text_snippet", "No text snippet available."),
-                         height=200, 
-                         disabled=True,
-                         label_visibility="collapsed")
-        
-        st.markdown("---")
-        st.subheader("Job Matching Results:")
-        
-        if DUMMY_JOBS and data_to_display:
-            all_job_match_results = []
-            with st.spinner("Calculating job matches..."):
-                for job_data_from_file in DUMMY_JOBS:
-                    match_details_for_this_job = calculate_match_score(data_to_display, job_data_from_file)
-
-                    all_job_match_results.append({
-                        "job_info": job_data_from_file,
-                        "match_details": match_details_for_this_job
-                    })
+            if "companies" in data_to_display_resume and data_to_display_resume["companies"]:
+                with st.expander("**Companies Mentioned in Experience**", expanded=False): # UI change
+                    for company_name in data_to_display_resume["companies"]:
+                        st.markdown(f"- {company_name}")
             
-            if all_job_match_results:
-                st.write("Here are the best matches for you based on the current criteria:")
-                for result_entry in all_job_match_results:
-                    job = result_entry["job_info"]          
-                    details = result_entry["match_details"]
+            if "contact_info" in data_to_display_resume and data_to_display_resume["contact_info"]:
+                with st.expander("**Contact Information**", expanded=False): # UI change
+                    contact = data_to_display_resume["contact_info"]
+                    if "emails" in contact and contact["emails"]:
+                        st.write(f"- Email(s): {', '.join(contact['emails'])}")
+                    if "phones" in contact and contact["phones"]:
+                        st.write(f"- Phone(s): {', '.join(contact['phones'])}")
+            
+            if "skills" in data_to_display_resume and data_to_display_resume["skills"]:
+                with st.expander("**Skills**", expanded=True): # UI change
+                    st.markdown(f"`{', '.join(data_to_display_resume['skills'])}`") # UI change
 
-                    job_title_from_json = job.get("job_title", job.get("title", "N/A")) 
-                    company_from_json = job.get("company", "N/A")
-                    overall_score_from_matcher = details.get('score', 0) * 100
+            if "education_details" in data_to_display_resume and data_to_display_resume["education_details"]:
+                st.write("**Education:**")
+                for i, edu_entry in enumerate(data_to_display_resume["education_details"]):
+                    degree = edu_entry.get("degree_mention", "N/A")
+                    institution = edu_entry.get("institution_mention", "N/A")
+                    date = edu_entry.get("date_mention", "N/A")
+                    display_degree = ' '.join(word.capitalize() for word in str(degree).split()) if degree != "N/A" else "N/A"
+                    exp_title = f"{display_degree} at {institution}" if institution != "N/A" and institution else display_degree
+                    if display_degree == "N/A" and (institution == "N/A" or not institution):
+                        exp_title = f"Education Entry {i+1}"
+                    elif display_degree == "N/A":
+                         exp_title = f"Education at {institution}"
 
-                    expander_title = f"{job_title_from_json} at {company_from_json} - Match Score: {overall_score_from_matcher:.1f}%"
+                    with st.expander(exp_title): # UI Change (more robust title)
+                        st.markdown(f"**Degree Phrase:** {degree}")
+                        st.markdown(f"**Institution:** {institution}")
+                        st.markdown(f"**Date:** {date}")
+            
+            if "education_level" in data_to_display_resume:
+                level_num = data_to_display_resume["education_level"]
+                st.write(f"**Highest Education Level (Parsed Code):** {level_num if level_num != -1 else 'Not determined'}") # UI change
 
-                    with st.expander(expander_title):
+            if "raw_text_snippet" in data_to_display_resume and data_to_display_resume["raw_text_snippet"]:
+                with st.expander("View Raw Extracted Text Snippet (from Resume)", expanded=False): # UI change
+                    st.text_area("raw_resume_text_display", # UI change
+                                 str(data_to_display_resume.get("raw_text_snippet", "No text snippet available.")),
+                                 height=150, disabled=True, label_visibility="collapsed")
+
+            st.markdown("---")
+            st.subheader("📊 Job Matching Results:") # UI change
+            
+            if DUMMY_JOBS and data_to_display_resume:
+                all_job_match_results = []
+                with st.spinner(f"Calculating job matches against {len(DUMMY_JOBS)} jobs..."):
+                    for job_data_from_file in DUMMY_JOBS: # Using DUMMY_JOBS from this file
+                        match_details = calculate_match_score(data_to_display_resume, job_data_from_file)
                         
-                        st.markdown(f"**Job ID (from file):** `{job.get('id', 'N/A')}`")
+                        # Adapt DUMMY_JOBS structure to what the new UI expects
+                        # Fallback for missing fields
+                        description_text = job_data_from_file.get("description", "")
+                        description_snippet = (description_text[:250] + "...") if len(description_text) > 250 else description_text
+
+                        all_job_match_results.append({
+                            "job_title": job_data_from_file.get("job_title", job_data_from_file.get("title", "N/A")),
+                            "company": job_data_from_file.get("company_name", job_data_from_file.get("company", "N/A")),
+                            "location": job_data_from_file.get("location", "N/A"), # Field might not exist in DUMMY_JOBS
+                            "url": job_data_from_file.get("url", "#"), # Field might not exist in DUMMY_JOBS
+                            "date_posted": job_data_from_file.get("date_posted", "N/A"), # Field might not exist in DUMMY_JOBS
+                            "description_snippet": description_snippet,
+                            "match_details": match_details,
+                            "job_id_for_debug": job_data_from_file.get("id", "N/A") # Keep for reference if needed
+                        })
+                
+                # Sort matches by score (descending)
+                sorted_matches = sorted(all_job_match_results, key=lambda x: x['match_details'].get('score', 0), reverse=True)
+
+                if sorted_matches:
+                    st.write(f"Showing top matches from {len(DUMMY_JOBS)} available jobs:")
+                    num_matches_to_show = st.slider("Number of top matches to display:", 1, max(1, min(20, len(sorted_matches))), 
+                                                    min(5, len(sorted_matches)), key="matches_slider") # UI change
+
+                    for i, result_entry in enumerate(sorted_matches[:num_matches_to_show]):
+                        job_title_display = result_entry["job_title"]
+                        company_display = result_entry["company"]
+                        details = result_entry["match_details"]
+                        overall_score_percent = details.get('score', 0) * 100
+
+                        expander_title = f"{i+1}. {job_title_display} at {company_display} - Overall Match: {overall_score_percent:.1f}%" # UI change
                         
-                        
-                        st.markdown(f"**Description:** {job.get('description', 'No description provided.')}")
-                        st.markdown("---") 
+                        with st.expander(expander_title, expanded=(i < 1)): # UI change (expand first)
+                            st.markdown(f"**Location:** {result_entry.get('location', 'N/A')} | **Posted:** {result_entry.get('date_posted', 'N/A')}")
+                            if result_entry.get('url', '#') != '#':
+                                st.markdown(f"**[View Full Job Listing (if available)]({result_entry.get('url', '#')})**", unsafe_allow_html=True)
+                            else:
+                                st.markdown(f"**Original Job ID:** `{result_entry.get('job_id_for_debug', 'N/A')}`")
+                            
+                            with st.container():
+                                st.caption("Description Snippet (from DUMMY_JOBS):")
+                                st.markdown(f"> _{result_entry.get('description_snippet', 'No description available.')}_")
+                            
+                            st.markdown("---") 
+                            st.markdown("**Match Score Breakdown:**")
 
-                        st.markdown("**Match Score Breakdown:**")
+                            cols = st.columns(2) # UI change: Metrics in columns
 
-                        # Skill Details
-                        skill_dtls = details.get('skill_details', {})
-                        skill_score_percent = skill_dtls.get('score', 0) * 100
-                        st.write(f"Skills Match: {skill_score_percent:.0f}% (Matched: {skill_dtls.get('match_count',0)} of {skill_dtls.get('required_count',0)} required)")
-                        if skill_dtls.get('matching_skills'):
-                            st.success(f"  Your Matching Skills: {', '.join(skill_dtls.get('matching_skills',[]))}")
-
-                        required_skills_in_jd = set(skill_dtls.get('required_skills', []))
-                        matched_skills_from_resume = set(skill_dtls.get('matching_skills', []))
-                        missing_skills_for_job = list(required_skills_in_jd - matched_skills_from_resume)
-
-                        if missing_skills_for_job:
-                             st.warning(f"  Skills to Explore for this Role: {', '.join(missing_skills_for_job)}")
-                        elif required_skills_in_jd : # If there were required skills and none are missing
-                            st.info("  You appear to have all the listed required skills for this role!")
-
-                        # Experience Details
-                        exp_dtls = details.get('experience_details', {})
-                        exp_score_val = exp_dtls.get('score',0)
-                        exp_status = "Met" if exp_score_val == 1.0 else "Not Met" if exp_score_val == 0.0 else "Partially Met/Info Missing"
-                        st.write(f"Experience Years Match: {exp_status} (Resume: {exp_dtls.get('resume_years', 'N/A')} yrs, Required: {exp_dtls.get('required_years', 'N/A')} yrs)")
+                            with cols[0]:
+                                skill_dtls = details.get('skill_details', {})
+                                skill_score_percent = skill_dtls.get('score', 0) * 100
+                                required_count = skill_dtls.get('required_count',0)
+                                delta_text_skill = f"{skill_dtls.get('match_count',0)}/{required_count} req." if required_count > 0 else f"{skill_dtls.get('match_count',0)} found"
+                                st.metric(label="Skills Match", value=f"{skill_score_percent:.0f}%", delta=delta_text_skill)
+                                if skill_dtls.get('matching_skills'):
+                                    st.success(f"Matching: {', '.join(skill_dtls.get('matching_skills',[]))}")
+                                
+                                required_jd_skills = set(skill_dtls.get('required_skills', []))
+                                resume_matched_skills = set(skill_dtls.get('matching_skills', []))
+                                missing_for_jd = list(required_jd_skills - resume_matched_skills)
+                                if missing_for_jd:
+                                    st.warning(f"To Explore: {', '.join(missing_for_jd)}")
+                                elif required_jd_skills and not missing_for_jd :
+                                    st.info("You appear to have all the listed required skills!")
 
 
-                        # Education Details
-                        edu_dtls = details.get('education_details', {})
-                        edu_score_val = edu_dtls.get('score',0)
-                        edu_status = "Met" if edu_score_val == 1.0 else "Not Met" if edu_score_val == 0.0 else "Partially Met/Info Missing"
-                        st.write(f"Education Level Match: {edu_status} (Resume Level: {edu_dtls.get('resume_level', 'N/A')}, Required Level: {edu_dtls.get('required_level', 'N/A')})")
+                                title_dtls = details.get('title_details', {})
+                                title_score_percent = title_dtls.get('score',0) * 100
+                                st.metric(label="Job Title Similarity", value=f"{title_score_percent:.0f}%")
+                                if title_dtls.get('matching_resume_titles'):
+                                    st.info(f"Similar Resume Titles: {', '.join(title_dtls.get('matching_resume_titles',[]))}")
 
-                        # Job Title Details
-                        title_dtls = details.get('title_details', {})
-                        title_score_val = title_dtls.get('score',0)
-                        title_status = "Potential Match Found" if title_score_val == 1.0 else "No Direct Title Match"
-                        st.write(f"Job Title Match: {title_status}")
-                        if title_dtls.get('matching_resume_titles'):
-                            st.info(f"  Resume titles considered a match: {', '.join(title_dtls.get('matching_resume_titles',[]))}")
-                        # mybe display title_dtls.get('jd_title') if useful
+                            with cols[1]:
+                                exp_dtls = details.get('experience_details', {})
+                                exp_score_val = exp_dtls.get('score',0)
+                                exp_status = "Met" if exp_score_val == 1.0 else "Not Met" if exp_dtls.get('required_years', 'N/A') != 'N/A' else "N/A"
+                                st.metric(label="Experience Years", value=f"{exp_dtls.get('resume_years', 'N/A')} yrs", delta=f"{exp_status} (Req: {exp_dtls.get('required_years', 'N/A')} yrs)")
 
-                        # Keyword Details
-                        keyword_dtls = details.get('keyword_details',{})
-                        keyword_score_percent = keyword_dtls.get('score',0)*100
-                        st.write(f"Description Keywords Match: {keyword_score_percent:.0f}% ({keyword_dtls.get('matching_keywords_count',0)} of {keyword_dtls.get('total_jd_keywords_count',0)} JD keywords found in resume)")
-                        if keyword_dtls.get('matching_keywords'):
-                             st.caption(f"  Common Keywords (up to 10): {', '.join(keyword_dtls.get('matching_keywords',[])[:10])}...")
+                                edu_dtls = details.get('education_details', {})
+                                edu_score_val = edu_dtls.get('score',0)
+                                edu_status = "Met" if edu_score_val == 1.0 else "Not Met" if edu_dtls.get('required_level', 'N/A') != 'N/A' else "N/A"
+                                st.metric(label="Education Level", value=f"Res: {edu_dtls.get('resume_level', 'N/A')}", delta=f"{edu_status} (Req: {edu_dtls.get('required_level', 'N/A')})")
+                            
+                            # Keyword details can be full width below columns if preferred, or inside a column
+                            keyword_dtls = details.get('keyword_details',{})
+                            keyword_score_percent = keyword_dtls.get('score',0)*100
+                            total_jd_keywords = keyword_dtls.get('total_jd_keywords_count',0)
+                            delta_text_keyword = f"{keyword_dtls.get('matching_keywords_count',0)}/{total_jd_keywords} common" if total_jd_keywords > 0 else f"{keyword_dtls.get('matching_keywords_count',0)} found"
 
+                            st.metric(label="Description Keywords Match", value=f"{keyword_score_percent:.0f}%", delta=delta_text_keyword)
+                            if keyword_dtls.get('matching_keywords'):
+                                st.caption(f"Common Keywords (sample): {', '.join(keyword_dtls.get('matching_keywords',[])[:5])}...")
+                else:
+                    st.info("No job matches found based on the current criteria or an issue with the matcher.")                
             else:
-               st.info("No job matches found based on the current criteria or matcher logic.")            
-        else:
-            if not DUMMY_JOBS:
-                 st.warning("Job data is not loaded. Cannot perform matching.")
+                if not DUMMY_JOBS: # This check is from original script
+                       st.warning("Job data (DUMMY_JOBS) is not loaded. Cannot perform matching.")
+                elif calculate_match_score is None:
+                    st.error("Job matcher component is not available. Cannot perform matching.")
+
 
 else:
-    st.info("Upload a resume file to get started.")
-    if 'parsed_resume_data' in st.session_state:
+    st.info("☝️ Upload a resume file to get started.") # UI change
+    if 'parsed_resume_data' in st.session_state: 
         del st.session_state.parsed_resume_data
-
-

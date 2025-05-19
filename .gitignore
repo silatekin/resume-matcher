@@ -4,3 +4,7 @@ __pycache__/
 .env
 parsed_resume_output.json
 .vscode/
+experience.txt
+appv1.txt
+appv2.txt
+prepare_test_datav1.txt
