@@ -1,18 +1,12 @@
 {
     "summary_text": "Summary:\nCreative designer specializing in branding and digital illustrations.",
     "skills": [
+        "Adobe Photoshop",
         "Figma",
         "Illustrator",
         "Photoshop"
     ],
-    "education_details": [
-        {
-            "degree_mention": null,
-            "institution_mention": "Graphic Design",
-            "date_mention": "2016",
-            "text": "Education: BFA in Graphic Design, Art Institute (2016)"
-        }
-    ],
+    "education_details": [],
     "contact_info": {
         "emails": [
             "jake.martinez@email.com"
@@ -26,15 +20,15 @@
             "job_title": "Freelance Designer (",
             "company": null,
             "start_date": "2018-01-01",
-            "end_date": "2025-05-17",
-            "description": ""
+            "end_date": "2025-05-20",
+            "description": ")\nDesigned logos for 50+ clients."
         },
         {
             "job_title": "Junior Designer",
-            "company": "Creative Agency",
+            "company": "Creative Agency (",
             "start_date": "2016-01-01",
             "end_date": "2018-01-01",
-            "description": ""
+            "description": ")\nAssisted in UI/UX projects."
         }
     ],
     "total_years_experience": 9.4,
@@ -64,9 +58,7 @@
         ]
     },
     "companies": [
-        "Assisted",
-        "Creative Agency",
-        "UI/UX"
+        "Creative Agency ("
     ],
     "raw_text_snippet": "Graphic Designer\nName: Jake Martinez\nEmail: jake.martinez@email.com | Phone: (555) 234-5678\nPortfolio: jakedesigns.com\nSummary:\nCreative designer specializing in branding and digital illustrations.\nExperience:\nFreelance Designer (2018–Present)\nDesigned logos for 50+ clients.\nJunior Designer, Creative Agency (2016–2018)\nAssisted in UI/UX projects.\nSkills: Adobe Photoshop, Illustrator, Figma\nEducation: BFA in Graphic Design, Art Institute (2016)"
 }

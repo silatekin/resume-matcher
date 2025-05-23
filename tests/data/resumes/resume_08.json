@@ -1,16 +1,10 @@
 {
     "summary_text": "Summary:\nTop-performing sales rep with a track record of exceeding targets.",
     "skills": [
-        "CRM"
+        "CRM",
+        "Negotiation"
     ],
-    "education_details": [
-        {
-            "degree_mention": "college",
-            "institution_mention": null,
-            "date_mention": "2018",
-            "text": "Education: B.A. in Business, State College (2018)"
-        }
-    ],
+    "education_details": [],
     "contact_info": {
         "emails": [
             "olivia.green@email.com"
@@ -21,18 +15,18 @@
     },
     "experience": [
         {
-            "job_title": null,
-            "company": "Sales Rep",
+            "job_title": "Sales Rep",
+            "company": "TechSales Inc. (",
             "start_date": "2020-01-01",
-            "end_date": "2025-05-17",
-            "description": ""
+            "end_date": "2025-05-20",
+            "description": ")\nClosed $500K in annual deals."
         },
         {
             "job_title": "Account Executive, SalesCo (",
             "company": null,
             "start_date": "2018-01-01",
             "end_date": "2020-01-01",
-            "description": ""
+            "description": ")"
         }
     ],
     "total_years_experience": 7.4,
@@ -64,7 +58,7 @@
         ]
     },
     "companies": [
-        "Sales Rep"
+        "TechSales Inc. ("
     ],
     "raw_text_snippet": "Sales Representative\nName: Olivia Green\nEmail: olivia.green@email.com | Phone: (555) 678-9012\nSummary:\nTop-performing sales rep with a track record of exceeding targets.\nExperience:\nSales Rep, TechSales Inc. (2020–Present)\nClosed $500K in annual deals.\nAccount Executive, SalesCo (2018–2020)\nSkills: CRM, Negotiation, Cold Calling\nEducation: B.A. in Business, State College (2018)"
 }

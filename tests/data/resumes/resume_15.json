@@ -1,9 +1,12 @@
 {
     "summary_text": null,
     "skills": [
+        "BI",
         "Data Analysis",
+        "Excel (Advanced)",
         "Git",
         "Machine Learning",
+        "Matplotlib",
         "MySQL",
         "NumPy",
         "Pandas",
@@ -12,27 +15,30 @@
         "Python",
         "R",
         "SQL",
+        "SQL Server",
         "Scikit-learn",
+        "Seaborn",
+        "Statistical Modeling",
         "Tableau"
     ],
     "education_details": [
         {
-            "degree_mention": "master",
-            "institution_mention": "IL\nGraduation",
+            "degree_mention": null,
+            "institution_mention": "Northwestern University",
             "date_mention": null,
-            "text": "Education\nMaster of Science in Data Science\nNorthwestern University, Evanston, IL\nGraduation:"
-        },
-        {
-            "degree_mention": "bachelor",
-            "institution_mention": "IL\nGraduation",
-            "date_mention": "May 2020",
-            "text": "May 2020\nBachelor of Arts in Economics\nUniversity of Illinois Urbana-Champaign, Urbana, IL\nGraduation:"
+            "text": "Northwestern University, Evanston, IL"
         },
         {
             "degree_mention": null,
-            "institution_mention": null,
-            "date_mention": "Dec 2017",
-            "text": "Dec 2017"
+            "institution_mention": "Bachelor of Arts in Economics",
+            "date_mention": null,
+            "text": "Bachelor of Arts in Economics"
+        },
+        {
+            "degree_mention": null,
+            "institution_mention": "University of Illinois Urbana-Champaign",
+            "date_mention": null,
+            "text": "University of Illinois Urbana-Champaign, Urbana, IL"
         }
     ],
     "contact_info": {
@@ -85,10 +91,6 @@
             "01/2022"
         ]
     },
-    "companies": [
-        "IL",
-        "Numbers Inc.",
-        "Quantify Corp"
-    ],
+    "companies": [],
     "raw_text_snippet": "Carol Danvers\nc.danvers.stats@protonmail.com\nSkills Summary\n- Data Analysis & Visualization: Python (Pandas, NumPy, Matplotlib, Seaborn), R, SQL, Tableau, Power BI\n- Statistical Modeling: Regression Analysis, Time Series Forecasting, Hypothesis Testing\n- Machine Learning (Basic): Scikit-learn\n- Databases: MySQL, PostgreSQL, SQL Server\n- Tools: Excel (Advanced), Jupyter Notebooks, Git\nExperience\nData Analyst | Quantify Corp | Chicago, IL\nStart Date: 02/2022 End Date: Present\n- Perform data extraction, cleaning, and analysis to identify key business insights.\n- Develop dashboards and reports to visualize data and communicate findings to stakeholders.\n- Contributed to a project that identified operational inefficiencies, saving the company $50"
 }

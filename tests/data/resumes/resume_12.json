@@ -13,27 +13,24 @@
         "JavaScript",
         "Jenkins",
         "Jira",
+        "Leadership",
         "MongoDB",
         "MySQL",
         "Node.js",
         "PostgreSQL",
+        "Problem-Solving",
         "Python",
         "React",
         "SQL",
-        "Spring"
+        "Spring",
+        "Spring Boot"
     ],
     "education_details": [
         {
-            "degree_mention": "master",
+            "degree_mention": null,
             "institution_mention": "State University",
             "date_mention": "2018",
-            "text": "Education\nMaster of Science in Computer Science | State University | Anytown, USA | 2018\n-"
-        },
-        {
-            "degree_mention": "bachelor",
-            "institution_mention": null,
-            "date_mention": "2016",
-            "text": "Thesis: \"Machine Learning for Anomaly Detection\"\nBachelor of Science in Information Technology | City College | Anytown, USA | 2016"
+            "text": "Master of Science in Computer Science | State University | Anytown, USA | 2018"
         }
     ],
     "contact_info": {
@@ -47,14 +44,14 @@
     "experience": [
         {
             "job_title": "Software Developer",
-            "company": "Tech Solutions Inc.",
+            "company": "Tech Solutions Inc. | Anytown, USA |",
             "start_date": "2020-01-01",
-            "end_date": "2025-05-17",
+            "end_date": "2025-05-20",
             "description": "- Developed and maintained scalable web applications using Python (Django) and React.\n- Collaborated with cross-functional teams to define project requirements and deliver solutions.\n- Improved application performance by 15% through code optimization and database tuning.\n- Led a team of 3 junior developers on a critical feature deployment.\n- Technologies used: Python, Django, JavaScript, React, PostgreSQL, Docker, AWS."
         },
         {
-            "job_title": "Junior Software Developer | Web Innovators LLC | Anytown, USA |",
-            "company": null,
+            "job_title": "Junior Software Developer",
+            "company": "Web Innovators LLC | Anytown, USA |",
             "start_date": "2018-06-01",
             "end_date": "2019-12-01",
             "description": "- Assisted in the development of client-facing websites using HTML, CSS, and JavaScript.\n- Participated in code reviews and contributed to a collaborative team environment.\n- Fixed bugs and implemented new features based on user feedback."
@@ -112,7 +109,8 @@
         ]
     },
     "companies": [
-        "Tech Solutions Inc."
+        "Tech Solutions Inc. | Anytown, USA |",
+        "Web Innovators LLC | Anytown, USA |"
     ],
     "raw_text_snippet": "John Michael Doe\njohn.doe@email.com | (555) 123-4567 | linkedin.com/in/johndoe | github.com/johndoe\nSummary\nHighly motivated and results-oriented Software Developer with 5+ years of experience in developing, testing, and deploying web applications. Proficient in Python, Java, and JavaScript frameworks. Seeking to leverage strong technical skills and problem-solving abilities to contribute to innovative projects.\nExperience\nSoftware Developer | Tech Solutions Inc. | Anytown, USA | Jan 2020 – Present\n- Developed and maintained scalable web applications using Python (Django) and React.\n- Collaborated with cross-functional teams to define project requirements and deliver solutions.\n- Improved application performance by 15% through code optimiza"
 }

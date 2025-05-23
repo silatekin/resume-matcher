@@ -7,14 +7,7 @@
         "React",
         "SQL"
     ],
-    "education_details": [
-        {
-            "degree_mention": "bs",
-            "institution_mention": "Stanford University",
-            "date_mention": "2018",
-            "text": "Education: B.S. in Computer Science, Stanford University (2018)"
-        }
-    ],
+    "education_details": [],
     "contact_info": {
         "emails": [
             "alex.johnson@email.com"
@@ -25,18 +18,18 @@
     },
     "experience": [
         {
-            "job_title": "Senior Software Engineer",
-            "company": "Google",
+            "job_title": "Senior Software Engineer, Google (",
+            "company": null,
             "start_date": "2021-01-01",
-            "end_date": "2025-05-17",
-            "description": "Led a team to build a customer dashboard using React and Redux.\nImproved API response time by 30% by optimizing backend queries."
+            "end_date": "2025-05-20",
+            "description": ")\nLed a team to build a customer dashboard using React and Redux.\nImproved API response time by 30% by optimizing backend queries."
         },
         {
-            "job_title": "Software Developer",
-            "company": "Pinterest",
+            "job_title": "Software Developer, Pinterest (",
+            "company": null,
             "start_date": "2018-01-01",
             "end_date": "2021-01-01",
-            "description": ""
+            "description": ")\nDeveloped RESTful APIs using Node.js and Express."
         }
     ],
     "total_years_experience": 7.4,
@@ -73,10 +66,6 @@
             "30%"
         ]
     },
-    "companies": [
-        "Google",
-        "Node.js and Express",
-        "Pinterest"
-    ],
+    "companies": [],
     "raw_text_snippet": "Software Engineer\nName: Alex Johnson\nEmail: alex.johnson@email.com | Phone: (555) 123-4567\nLinkedIn: linkedin.com/in/alexjohnson | GitHub: github.com/alexjohnson\nSummary:\nFull-stack developer with 5+ years of experience in JavaScript, React, and Node.js. Passionate about building scalable web applications.\nExperience:\nSenior Software Engineer, Google (2021–Present)\nLed a team to build a customer dashboard using React and Redux.\nImproved API response time by 30% by optimizing backend queries.\nSoftware Developer, Pinterest (2018–2021)\nDeveloped RESTful APIs using Node.js and Express.\nSkills: JavaScript, React, Node.js, Python, SQL\nEducation: B.S. in Computer Science, Stanford University (2018)"
 }

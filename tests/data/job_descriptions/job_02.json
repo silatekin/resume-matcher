@@ -24,5 +24,6 @@
     ],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": 5
+    "minimum_years_experience": 5,
+    "required_education_level": null
 }

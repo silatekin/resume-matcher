@@ -8,3 +8,6 @@ experience.txt
 appv1.txt
 appv2.txt
 prepare_test_datav1.txt
+job_descriptions.csv
+resume_parserv1.txt
+load_job_descriptions.py

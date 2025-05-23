@@ -1,14 +1,7 @@
 {
     "summary_text": "Summary:\nDedicated educator with 8+ years of experience fostering student growth.",
     "skills": [],
-    "education_details": [
-        {
-            "degree_mention": "college",
-            "institution_mention": "Elementary Education",
-            "date_mention": "2015",
-            "text": "Education: M.Ed in Elementary Education, Teachers College (2015)"
-        }
-    ],
+    "education_details": [],
     "contact_info": {
         "emails": [
             "michael.brown@email.com"
@@ -20,17 +13,17 @@
     "experience": [
         {
             "job_title": "3rd Grade Teacher",
-            "company": "Sunshine Elementary",
+            "company": "Sunshine Elementary (",
             "start_date": "2017-01-01",
-            "end_date": "2025-05-17",
-            "description": "Improved reading scores by 20% through personalized learning."
+            "end_date": "2025-05-20",
+            "description": ")\nImproved reading scores by 20% through personalized learning."
         },
         {
-            "job_title": "Substitute Teacher, District Schools (",
-            "company": null,
+            "job_title": "Substitute Teacher",
+            "company": "District Schools (",
             "start_date": "2015-01-01",
             "end_date": "2017-01-01",
-            "description": ""
+            "description": ")"
         }
     ],
     "total_years_experience": 10.4,
@@ -64,7 +57,8 @@
         ]
     },
     "companies": [
-        "Sunshine Elementary"
+        "District Schools (",
+        "Sunshine Elementary ("
     ],
     "raw_text_snippet": "Teacher (Elementary)\nName: Michael Brown\nEmail: michael.brown@email.com | Phone: (555) 567-8901\nSummary:\nDedicated educator with 8+ years of experience fostering student growth.\nExperience:\n3rd Grade Teacher, Sunshine Elementary (2017–Present)\nImproved reading scores by 20% through personalized learning.\nSubstitute Teacher, District Schools (2015–2017)\nSkills: Classroom Management, Curriculum Development\nEducation: M.Ed in Elementary Education, Teachers College (2015)"
 }

@@ -18,5 +18,6 @@
     "skills": [],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": 3
+    "minimum_years_experience": 3,
+    "required_education_level": null
 }

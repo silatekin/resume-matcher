@@ -2,14 +2,24 @@
     "summary_text": "Objective\nTo secure a challenging Customer Service position where my communication and problem-solving skills can contribute to customer satisfaction and company success.",
     "skills": [
         "CRM",
-        "Salesforce"
+        "Communication",
+        "Conflict Resolution",
+        "Customer Relationship Management",
+        "Salesforce",
+        "Zendesk"
     ],
     "education_details": [
         {
-            "degree_mention": "associate",
-            "institution_mention": null,
+            "degree_mention": null,
+            "institution_mention": "Associate of Arts in Business Administration",
+            "date_mention": null,
+            "text": "Associate of Arts in Business Administration"
+        },
+        {
+            "degree_mention": null,
+            "institution_mention": "Community College of Anytown",
             "date_mention": "2019",
-            "text": "Education\nAssociate of Arts in Business Administration\nCommunity College of Anytown, Anytown, ST, 2019"
+            "text": "Community College of Anytown, Anytown, ST, 2019"
         }
     ],
     "contact_info": {
@@ -22,15 +32,15 @@
     },
     "experience": [
         {
-            "job_title": "Customer Service Lead",
-            "company": "ConnectAll Services",
+            "job_title": null,
+            "company": null,
             "start_date": "2021-01-01",
-            "end_date": "2025-05-17",
-            "description": "- Supervised a team of 5 customer service representatives.\n- Handled escalated customer issues and provided solutions.\n- Developed training materials for new hires.\n- Achieved a 95% customer satisfaction rating in Q4 2023."
+            "end_date": "2025-05-20",
+            "description": "- Supervised a team of 5 customer service representatives.\n- Handled escalated customer issues and provided solutions.\n- Developed training materials for new hires.\n- Achieved a 95% customer satisfaction rating in Q4 2023.\nCustomer Service Representative | SupportNow Ltd. | Anytown, ST"
         },
         {
             "job_title": null,
-            "company": "Customer Service Representative",
+            "company": null,
             "start_date": "2019-01-01",
             "end_date": "2021-01-01",
             "description": "- Responded to customer inquiries via phone, email, and chat.\n- Resolved product and service issues efficiently.\n- Maintained detailed records of customer interactions."
@@ -77,10 +87,6 @@
             "English"
         ]
     },
-    "companies": [
-        "ConnectAll Services",
-        "Customer Service Representative",
-        "SupportNow Ltd."
-    ],
+    "companies": [],
     "raw_text_snippet": "Eve Adams\neve.a@jobmail.com | 555-111-2222\nObjective\nTo secure a challenging Customer Service position where my communication and problem-solving skills can contribute to customer satisfaction and company success.\nExperience\nCustomer Service Lead | ConnectAll Services | Remote\n2021 - Present\n- Supervised a team of 5 customer service representatives.\n- Handled escalated customer issues and provided solutions.\n- Developed training materials for new hires.\n- Achieved a 95% customer satisfaction rating in Q4 2023.\nCustomer Service Representative | SupportNow Ltd. | Anytown, ST\n2019 - 2021\n- Responded to customer inquiries via phone, email, and chat.\n- Resolved product and service issues efficiently.\n- Maintained detailed records of customer int"
 }

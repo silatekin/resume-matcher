@@ -3,17 +3,22 @@
     "skills": [
         "Copywriting",
         "Digital Marketing",
+        "Email Marketing",
         "Google Ads",
         "Google Analytics",
         "HubSpot",
-        "SEO"
+        "Market Research",
+        "PPC",
+        "SEM",
+        "SEO",
+        "Social Media Marketing"
     ],
     "education_details": [
         {
-            "degree_mention": "ba",
+            "degree_mention": null,
             "institution_mention": "University of Metropolis | Metropolis",
             "date_mention": "May 2020",
-            "text": "Education\nB.A. in Marketing | University of Metropolis | Metropolis, USA | Graduated May 2020\n- Minor in Communications\n- Dean's List: 2018, 2019"
+            "text": "B.A. in Marketing | University of Metropolis | Metropolis, USA | Graduated May 2020"
         }
     ],
     "contact_info": {
@@ -26,15 +31,15 @@
     },
     "experience": [
         {
-            "job_title": "Marketing Specialist",
-            "company": "Creative Minds Agency",
+            "job_title": "Professional Experience",
+            "company": null,
             "start_date": "2021-03-01",
-            "end_date": "2025-05-17",
-            "description": "- Developed and executed digital marketing campaigns across multiple channels (SEO, SEM, Social Media, Email).\n- Managed social media presence, resulting in a 25% increase in follower engagement.\n- Wrote and edited compelling content for blogs, websites, and marketing materials.\n- Analyzed campaign performance data to identify trends and optimize strategies."
+            "end_date": "2025-05-20",
+            "description": "- Developed and executed digital marketing campaigns across multiple channels (SEO, SEM, Social Media, Email).\n- Managed social media presence, resulting in a 25% increase in follower engagement.\n- Wrote and edited compelling content for blogs, websites, and marketing materials.\n- Analyzed campaign performance data to identify trends and optimize strategies.\nMarketing Intern | Bright Ideas Co. | Metropolis, USA"
         },
         {
-            "job_title": "Marketing Intern",
-            "company": "Bright Ideas Co.",
+            "job_title": null,
+            "company": null,
             "start_date": "2020-06-01",
             "end_date": "2021-02-01",
             "description": "- Supported the marketing team with market research and competitor analysis.\n- Assisted in the creation of promotional materials."
@@ -91,9 +96,6 @@
             "Spanish"
         ]
     },
-    "companies": [
-        "Bright Ideas Co.",
-        "Creative Minds Agency"
-    ],
+    "companies": [],
     "raw_text_snippet": "Alice B. Wonderland\nalice.wonderland@email.net | 555-987-6543 | linkedin.com/in/alicewonder\nProfile\nCreative and data-driven Marketing Specialist with 3 years of experience in digital marketing, content creation, and campaign management. Proven ability to increase brand awareness and drive engagement. Eager to apply marketing expertise in a challenging new role.\nProfessional Experience\nMarketing Specialist | Creative Minds Agency | Metropolis, USA\nMarch 2021 to Current\n- Developed and executed digital marketing campaigns across multiple channels (SEO, SEM, Social Media, Email).\n- Managed social media presence, resulting in a 25% increase in follower engagement.\n- Wrote and edited compelling content for blogs, websites, and marketing materia"
 }

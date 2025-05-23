@@ -17,13 +17,14 @@
         "Experience with machine learning basics."
     ],
     "skills": [
+        "SQL",
         "NumPy",
-        "data analysis",
         "pandas",
         "Python",
-        "SQL"
+        "data analysis"
     ],
     "education": [],
     "compensation": [],
-    "minimum_years_experience": 2
+    "minimum_years_experience": 2,
+    "required_education_level": null
 }

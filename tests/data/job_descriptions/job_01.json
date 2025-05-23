@@ -21,17 +21,17 @@
     ],
     "preferred_qualifications": [],
     "skills": [
-        "Azure",
+        "Git",
         "GCP",
-        "Docker",
-        "CI/CD",
-        "Django",
-        "Python",
-        "AWS",
-        "SQL",
         "Flask",
         "Kubernetes",
-        "Git"
+        "CI/CD",
+        "AWS",
+        "SQL",
+        "Azure",
+        "Django",
+        "Python",
+        "Docker"
     ],
     "education": [
         "Bachelor's degree minimum. Master's preferred."

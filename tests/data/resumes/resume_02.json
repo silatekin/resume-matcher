@@ -1,17 +1,12 @@
 {
     "summary_text": "Summary:\nDigital marketing expert with 7+ years of experience in SEO, content strategy, and social media campaigns.",
     "skills": [
+        "Content Marketing",
+        "Facebook Ads",
         "Google Ads",
         "SEO"
     ],
-    "education_details": [
-        {
-            "degree_mention": "mba",
-            "institution_mention": "Business University",
-            "date_mention": "2016",
-            "text": "Education: MBA in Marketing, Business University (2016)"
-        }
-    ],
+    "education_details": [],
     "contact_info": {
         "emails": [
             "sarah.williams@email.com"
@@ -23,17 +18,17 @@
     "experience": [
         {
             "job_title": "Marketing Manager",
-            "company": "Coca Cola",
+            "company": "Coca Cola (",
             "start_date": "2020-01-01",
-            "end_date": "2025-05-17",
-            "description": ""
+            "end_date": "2025-05-20",
+            "description": ")\nIncreased organic traffic by 50% through SEO optimization.\nManaged a $100K/month ad budget on Google and Facebook."
         },
         {
-            "job_title": null,
-            "company": "Digital Marketer",
+            "job_title": "Digital Marketer",
+            "company": "Unilever (",
             "start_date": "2016-01-01",
             "end_date": "2020-01-01",
-            "description": ""
+            "description": ")\nRan successful influencer marketing campaigns."
         }
     ],
     "total_years_experience": 9.4,
@@ -69,11 +64,8 @@
         ]
     },
     "companies": [
-        "Coca Cola",
-        "Digital Marketer",
-        "Facebook",
-        "Google",
-        "SEO"
+        "Coca Cola (",
+        "Unilever ("
     ],
     "raw_text_snippet": "Marketing Manager\nName: Sarah Williams\nEmail: sarah.williams@email.com | Phone: (555) 987-6543\nLinkedIn: linkedin.com/in/sarahwilliams\nSummary:\nDigital marketing expert with 7+ years of experience in SEO, content strategy, and social media campaigns.\nExperience:\nMarketing Manager, Coca Cola (2020–Present)\nIncreased organic traffic by 50% through SEO optimization.\nManaged a $100K/month ad budget on Google and Facebook.\nDigital Marketer, Unilever (2016–2020)\nRan successful influencer marketing campaigns.\nSkills: SEO, Google Ads, Facebook Ads, Content Marketing\nEducation: MBA in Marketing, Business University (2016)"
 }

@@ -75,12 +75,22 @@ SECTION_HEADERS = {
 }
 
 EDUCATION_LEVELS = {
-    "phd": 5, "doctorate": 5,
-    "master": 4, "masters": 4, "msc": 4, "mba": 4, "meng": 4, "ma": 4, "ms": 4,
-    "bachelor": 3, "bachelors": 3, "bsc": 3, "beng": 3, "ba": 3, "bs": 3,
-    "associate": 2, "associates": 2,
+    "phd": 5, "doctorate": 5, "dphil": 5, 
+    "master": 4, "masters": 4, 
+    "msc": 4, "m.sc": 4, "m.s.": 4, "ms": 4, 
+    "mba": 4, "m.b.a": 4,               
+    "meng": 4, "m.eng": 4,               
+    "mtech": 4, "m.tech": 4,           
+    "ma": 4, "m.a.": 4,                  
+    "bachelor": 3, "bachelors": 3,
+    "bsc": 3, "b.sc": 3, "b.s.": 3, "bs": 3, 
+    "beng": 3, "b.eng": 3,                
+    "btech": 3, "b.tech": 3,            
+    "ba": 3, "b.a.": 3,                   
+    "bca": 3,                             
+    "associate": 2, "associates": 2, "aa": 2, "as": 2, 
     "college": 1, 
-    "high school": 0, "ged": 0
+    "high school": 0, "ged": 0, "diploma": 0 
 }
 
 def segment_jd(text):
@@ -379,19 +389,28 @@ def parse_jd_sections(sections):
         
         
         logging.info("--- Determining LOWEST Education Level Mentioned ---")
-        lowest_level_found = None
-        text_to_search = (sections.get('education', '') + "\n" + sections.get('qualifications', '')).lower()
+    lowest_level_found = None
+    text_to_search_raw = (sections.get('education', '') + "\n" + sections.get('qualifications', '')).lower()
 
-        if text_to_search.strip():
-            for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1]):
-                pattern = r'\b' + re.escape(keyword) + r'\b'
-                if re.search(pattern, text_to_search):
-                    lowest_level_found = level
-                    logging.info(f"Found lowest level mention: {keyword} (Level {level})")
-                    break 
+    if text_to_search_raw.strip():
+        text_to_search_cleaned = re.sub(r'\b([a-z])\.(?=[a-z]{1,4}\b|\s|$)', r'\1', text_to_search_raw)
+        text_to_search_cleaned = re.sub(r'\s+', ' ', text_to_search_cleaned).strip() 
 
-        parsed_jd['required_education_level'] = lowest_level_found 
-        logging.info(f"Assigned lowest education level mentioned: {lowest_level_found}")
+        logging.info(f"Cleaned text for education level search: '{text_to_search_cleaned[:200]}...'") 
+
+        # Iterate through EDUCATION_LEVELS, sorted by level value to find the lowest mentioned
+        # (e.g., if "Bachelor's and Master's" is mentioned, it should pick Bachelor's as the minimum requirement)
+        for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1]):
+            # Use word boundaries for more precise matching
+            pattern = r'\b' + re.escape(keyword) + r'\b'
+            if re.search(pattern, text_to_search_cleaned): # Search in the cleaned text
+                lowest_level_found = level
+                logging.info(f"Found lowest level mention: '{keyword}' (Level {level}) in text.")
+                break  # Stop after finding the first (lowest) level match
+
+    parsed_jd['required_education_level'] = lowest_level_found
+    logging.info(f"Assigned lowest education level mentioned: {lowest_level_found}")
+
 
 
     # 8. Process sections.get('about')
@@ -475,7 +494,7 @@ def parse_jd_file(filepath):
         logging.error(f"An unexpected error occurred parsing JD file {filepath}: {e}", exc_info=True)
         return None 
 
-"""
+
 
 # ==================================================
 #  TESTING BLOCK
@@ -510,4 +529,3 @@ if __name__ == "__main__":
     logging.info("JD Parsing Test Finished.")
 
     
-"""

@@ -1,14 +1,10 @@
 {
     "summary_text": "Summary:\nEngineer with expertise in product design and CAD modeling.",
-    "skills": [],
-    "education_details": [
-        {
-            "degree_mention": "bs",
-            "institution_mention": "Mechanical Engineering",
-            "date_mention": "2018",
-            "text": "Education: B.S. in Mechanical Engineering, Tech University (2018)"
-        }
+    "skills": [
+        "CAD",
+        "Prototyping"
     ],
+    "education_details": [],
     "contact_info": {
         "emails": [
             "lisa.wong@email.com"
@@ -20,17 +16,17 @@
     "experience": [
         {
             "job_title": "Mechanical Engineer",
-            "company": "AutoTech",
+            "company": "AutoTech (",
             "start_date": "2020-01-01",
-            "end_date": "2025-05-17",
-            "description": ""
+            "end_date": "2025-05-20",
+            "description": ")\nDesigned automotive components using SolidWorks."
         },
         {
             "job_title": "Engineering Intern, MechSolutions (",
-            "company": "SolidWorks",
+            "company": null,
             "start_date": "2018-01-01",
             "end_date": "2020-01-01",
-            "description": ""
+            "description": ")"
         }
     ],
     "total_years_experience": 7.4,
@@ -62,8 +58,7 @@
         ]
     },
     "companies": [
-        "AutoTech",
-        "SolidWorks"
+        "AutoTech ("
     ],
     "raw_text_snippet": "Mechanical Engineer\nName: Lisa Wong\nEmail: lisa.wong@email.com | Phone: (555) 901-2345\nSummary:\nEngineer with expertise in product design and CAD modeling.\nExperience:\nMechanical Engineer, AutoTech (2020–Present)\nDesigned automotive components using SolidWorks.\nEngineering Intern, MechSolutions (2018–2020)\nSkills: CAD, Finite Element Analysis, Prototyping\nEducation: B.S. in Mechanical Engineering, Tech University (2018)"
 }
