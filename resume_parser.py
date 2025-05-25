@@ -8,8 +8,7 @@ from dateutil.parser import parse as parse_datetime
 from dateutil.relativedelta import relativedelta
 import logging
 import os
-from docx import Document
-import pdfplumber
+from file_utils import read_docx_file,read_pdf_file,read_text_file,get_text_from_txt_object,get_text_from_docx_object,get_text_from_pdf_object
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -27,65 +26,14 @@ except OSError:
         logging.error("Spacy model 'en_core_web_sm' also not found. NLP features will be unavailable if not passed explicitly.")
 
 
-def read_text_file(file_path):
-    try:
-        with open(file_path,'r',encoding='utf-8') as file:
-            text = file.read()
-        logging.info(f"Succesfully read file: {file_path}")
-        return text
-    except FileNotFoundError:
-        logging.error(f"Error: File not found at {file_path}")
-        return None
-    except Exception as e:
-        logging.error(f"Error reading file {file_path}:{e}")
-        return None
-
-def read_docx_file(file_path):
-    
-    full_text = []
-    try:
-        doc = Document(file_path)
-        for para in doc.paragraphs:
-            full_text.append(para.text)
-        logging.info(f"Succesfully read docx file from: {file_path}")
-        return '\n'.join(full_text)  
-    except FileNotFoundError:
-        logging.error(f"Error: DOCX File not found at {file_path}")
-        return None
-    except Exception as e:
-        logging.error(f"Error reading DOCX file {file_path}: {e}")
-        return None
-
-def read_pdf_file(file_path):
-    full_text = []
-    try: 
-        with pdfplumber.open(file_path) as pdf:
-            for page in pdf.pages:
-                extracted_page_text = page.extract_text()
-                if extracted_page_text:
-                    full_text.append(extracted_page_text.strip()) 
-        
-        raw_text = '\n'.join(filter(None,full_text))
-
-        if not raw_text.strip():
-            logging.warning(f"No text extracted or PDF is empty: {file_path}")
-            return None
-        logging.info(f"Successfully read PDF file from: {file_path}")
-        return raw_text
-    except FileNotFoundError:
-         logging.error(f"Error: PDF File not found at {file_path}")
-         return None
-    except Exception as e: # Catch other pdfplumber or general exceptions
-        logging.error(f"Error reading PDF file {file_path}: {e}")
-        return None
-
-
 def clean_text(text):
     if not isinstance(text, str):
         logging.warning("clean_text received non-string input, returning empty string.")
         return ""
     text = text.strip()
     text = text.replace('\xa0', ' ') 
+    #from "  Hello \n World \n\n   \nPython  "
+    #to "Hello\nWorld\nPython"
     text = '\n'.join([line.strip() for line in text.splitlines() if line.strip()])
     return text
 
@@ -119,11 +67,11 @@ TECH_SKILLS_SET_GLOBAL = set(TECH_SKILLS_LIST_GLOBAL)
 
 # do NOT use \\s
 SECTION_HEADERS_GLOBAL = {
-    "summary": r"^\s*(summary|profile|objective|about\s*me)([:\s]|\s*$)", # Changed \\s to \s
-    "skills": r"^\s*(skills|technical\s*skills|technical\s*proficiency|core\s*competencies|technologies)([:\s]|\s*$)", # Changed \\s to \s
-    "experience": r"^\s*(experience|work\s*experience|employment\s*history|professional\s*experience)([:\s]|\s*$)", # Changed \\s to \s
-    "education": r"^\s*(education|academic\s*background|academic\s*qualifications)([:\s]|\s*$)", # Changed \\s to \s
-    "projects": r"^\s*(projects|personal\s*projects)([:\s]|\s*$)", # Changed \\s to \s
+    "summary": r"^\s*(summary|profile|objective|about\s*me)([:\s]|\s*$)", 
+    "skills": r"^\s*(skills|technical\s*skills|technical\s*proficiency|core\s*competencies|technologies)([:\s]|\s*$)", 
+    "experience": r"^\s*(experience|work\s*experience|employment\s*history|professional\s*experience)([:\s]|\s*$)",
+    "education": r"^\s*(education|academic\s*background|academic\s*qualifications)([:\s]|\s*$)", 
+    "projects": r"^\s*(projects|personal\s*projects)([:\s]|\s*$)", 
 }
 
 EDUCATION_LEVELS_GLOBAL = {
@@ -145,7 +93,7 @@ EDUCATION_LEVELS_GLOBAL = {
     "high school": 0, "ged": 0, "diploma": 0
 }
 
-def segment_resume(raw_text, section_headers_dict): # section_headers_dict is kit.SECTION_HEADERS
+def segment_resume(raw_text, section_headers_dict): 
     if not raw_text:
         return {}
     
@@ -154,15 +102,15 @@ def segment_resume(raw_text, section_headers_dict): # section_headers_dict is ki
     lines = raw_text.splitlines()
     compiled_patterns = {}
 
-    logging.debug("--- Compiling Section Header Regex Patterns ---")
+    logging.debug("- Compiling Section Header Regex Patterns -")
     # This loop uses section_headers_dict which should be the complete one from main via ParsingKit
-    for key,pattern_str in section_headers_dict.items(): # Renamed pattern to pattern_str for clarity
+    for key,pattern_str in section_headers_dict.items(): 
         try:
-            compiled_patterns[key] = re.compile(pattern_str,re.IGNORECASE) # Use pattern_str here
+            compiled_patterns[key] = re.compile(pattern_str,re.IGNORECASE) 
             logging.debug(f"Compiled pattern for '{key}': {pattern_str}")
         except re.error as e:
             logging.error(f"Regex error in pattern for '{key}': {pattern_str} - {e}")
-            continue # Skip this pattern if invalid
+            continue 
     
     current_section_content = []
 
@@ -170,14 +118,15 @@ def segment_resume(raw_text, section_headers_dict): # section_headers_dict is ki
         line_text_for_match = line.strip() 
         
         if not line_text_for_match: 
-            if line.strip(): # If original line had content (e.g. just spaces, but not empty)
-                 current_section_content.append(line) # Add original line to preserve formatting
-            continue
-            
+            if line: 
+                 current_section_content.append(line) 
+            continue           
+        
         matched_key = None
         logging.debug(f"--- SEGMENTATION ATTEMPT ON Line {i}: Raw='{line}', Stripped='{line_text_for_match}' ---") # Shows the line being processed
         if not compiled_patterns:
             logging.debug("Segment_Debug: compiled_patterns dictionary is EMPTY!")
+        
         for key, pattern_obj in compiled_patterns.items():
             logging.debug(f"Segment_Debug: Trying Key='{key}', Pattern='{pattern_obj.pattern}', Against='{line_text_for_match}'")
             match_result = pattern_obj.match(line_text_for_match)
@@ -188,20 +137,20 @@ def segment_resume(raw_text, section_headers_dict): # section_headers_dict is ki
             else:
                 logging.debug(f"Segment_Debug: FAILED to match Key='{key}' for line '{line_text_for_match}'")
         
+
         if matched_key: 
             if current_section_content: 
                 sections[current_section_key] = "\n".join(current_section_content).strip()
             current_section_key = matched_key
-            # Start new section with the original line to preserve any leading/trailing spaces if it's part of content
             current_section_content = [line] 
         else: 
-            if line.strip(): # Add line to content if it's not just an empty stripped line
+            if line.strip(): 
                 current_section_content.append(line)
 
     if current_section_content:
         sections[current_section_key] = "\n".join(current_section_content).strip()
 
-    sections = {k: v for k, v in sections.items() if v.strip()} # Ensure sections are not just whitespace
+    sections = {k: v for k, v in sections.items() if v.strip()} #Ensure sections are not just whitespace
     logging.info(f"Segmented resume into sections: {list(sections.keys())}")
     return sections
 
@@ -232,10 +181,10 @@ class ParsingKit:
             pass
 
         patterns = [
-            r"(\d{4})",                 # Matches Year only (e.g., "2020")
+            r"(\d{4})",                 # Matches Year only ("2020")
             r"(\w+)\s+(\d{4})",         # Month Name + Year ("May 2021")
-            r"(\d{1,2})/(\d{4})",       # MM/YYYY (e.g., "05/2022")
-            r"(\d{1,2})-(\d{4})",       # MM-YYYY (e.g., "05-2022")
+            r"(\d{1,2})/(\d{4})",       # MM/YYYY ("05/2022")
+            r"(\d{1,2})-(\d{4})",       # MM-YYYY ("05-2022")
         ]
 
         #---Plan B(if try block fails)
@@ -245,7 +194,7 @@ class ParsingKit:
                 try:
                     if len(match.groups()) == 1: #only year matched(pattern 1)
                         return datetime.datetime(int(match.group(1)), 1, 1) #assume Jan 1st
-                    elif len(match.groups()) == 2: #Month/Year MM/YYYY matched
+                    elif len(match.groups()) == 2: #MM/YYYY matched
                         month_str = match.group(1)
                         year_str = match.group(2)
                         try:
@@ -257,7 +206,7 @@ class ParsingKit:
                                 month = month_dt.month #Gets the month number
                             except (ValueError, TypeError):
                                 logging.warning(f"Could not parse month name: '{month_str}' in '{date_string}'")
-                                continue # Invalid month name, try next regex pattern
+                                continue 
                         if not (1 <= month <= 12): 
                             logging.warning(f"Invalid month '{month}' in '{date_string}'")
                             continue    
@@ -278,9 +227,11 @@ class ParsingKit:
             return highest_level
         
         text_lower = text.lower()
+        #clearing abbreviations "B.Sc." to "BSc"
         text_lower = re.sub(r'\b([a-z])\.', r'\1', text_lower)
 
         for keyword,level in self.EDUCATION_LEVELS.items():
+            #avoiding partial matches
             pattern = r'\b' + re.escape(keyword) + r'\b'
             if re.search(pattern, text_lower):
                 highest_level = max(highest_level, level)
@@ -312,6 +263,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
                 "companies": [],
     }
 
+    #-------Summary Extraction--------
     if "summary" in sections:
         summary_text_content = sections["summary"]
         parsed_resume["summary_text"] = summary_text_content.strip() # Store the raw summary text
@@ -338,7 +290,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
             for i in range(start, end):
                 matched_indices.add(i)
 
-        # Token matching for single-word skills but only if the token wasn't already part of a phrase match
+        # Token matching for single-word skills only if the token wasn't already part of a phrase match
         for token in skills_doc:
             if token.i not in matched_indices: 
                 if token.lemma_.lower() in kit.tech_skills_set:
@@ -350,8 +302,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
         parsed_resume["skills"] = sorted(list(found_skills))
         logging.info(f"Extracted {len(parsed_resume['skills'])} unique skills.")
     
-    #-------Education Extraction--------
-    # Initialize in the main parsed_resume dictionary
+    #---Education Extraction-----
     if "education_details" not in parsed_resume or not isinstance(parsed_resume.get("education_details"), list):
         parsed_resume["education_details"] = []
     if "education_level" not in parsed_resume:
@@ -359,43 +310,45 @@ def parse_resume_sections(sections, kit: ParsingKit):
 
     if "education" in sections:
         education_text = sections["education"]
-        # Get overall highest education level from the entire section text first
         highest_edu_level_found = kit.get_education_level(education_text)
         parsed_resume["education_level"] = highest_edu_level_found
         
-        # Split the education section into lines for individual processing
-        potential_degree_lines = [line.strip() for line in education_text.splitlines() if line.strip()]
+        # splitting the education section
+        potential_degree_lines = [line.strip() 
+                                  for line in education_text.splitlines()
+                                    if line.strip()]
         
-        # Remove the "Education" header itself if it's the first line of the content
+        # if "Education" header is the first line of the content
         if potential_degree_lines and potential_degree_lines[0].lower() == "education":
             potential_degree_lines = potential_degree_lines[1:]
 
         for line_text in potential_degree_lines:
-            if not line_text: # Skip any remaining empty lines
+            if not line_text: 
                 continue
 
-            doc_line = kit.nlp(line_text) # Process this individual line with SpaCy
+            doc_line = kit.nlp(line_text) 
 
-            # Initialize for this specific line/entry
+            # for this specific line
             degree_mention = None
             institution_mention = None
             date_mention = None 
             
-            line_lower_processed = line_text.lower().replace('\xa0', ' ') # Replace non-breaking space
+            line_lower_processed = line_text.lower().replace('\xa0', ' ') 
             line_lower_processed = re.sub(r'\b([a-z])\.', r'\1', line_lower_processed) # Remove periods from B.S. -> bs
 
-            # 1. Find Degree Mention on this line
-            # Regex for specific degree patterns (e.g., B.S. in ..., Master of Science in ...)
-            # This pattern tries to capture both abbreviations and fuller names with fields of study.
+            # 1.Find Degree Mention on this line
+            # This pattern tries to capture both abbreviations and fuller names with fields of study
+            #goes from B.S. in Computer Science | Minor in Fun, --> B.S. in Computer Science
             specific_degree_pattern = re.compile(
                 r"""
+                #first we check full degree names
                 \b(
                     (?:Bachelor|Master|Associate|Doctor(?:ate)?)\s*
-                    (?:of|in|of\sScience|of\sArts|of\sBusiness\sAdministration|of\sEngineering|of\sPhilosophy)?\s* # Common "of X"
-                    (?:in\s+)?[\w\s\(\)\-\.,'&]+?  # Field of study (allows more characters)
-                    |                                   # OR
-                    (?:B\.?S\.?C?|M\.?S\.?C?|M\.?B\.?A\.?|M\.A\.|A\.?A\.?S?|Ph\.?D\.?|B\.?Eng\.?|M\.?Eng\.?) # Abbreviations
-                    (?:\s*(?:in|of)\s+[\w\s\(\)\-\.,'&]+?)? # Optional field for abbreviations
+                    (?:of|in|of\sScience|of\sArts|of\sBusiness\sAdministration|of\sEngineering|of\sPhilosophy)?\s* 
+                    (?:in\s+)?[\w\s\(\)\-\.,'&]+?  
+                    |                                   
+                    (?:B\.?S\.?C?|M\.?S\.?C?|M\.?B\.?A\.?|M\.A\.|A\.?A\.?S?|Ph\.?D\.?|B\.?Eng\.?|M\.?Eng\.?) 
+                    (?:\s*(?:in|of)\s+[\w\s\(\)\-\.,'&]+?)? 
                 )\b
                 """, 
                 re.IGNORECASE | re.VERBOSE
@@ -404,86 +357,76 @@ def parse_resume_sections(sections, kit: ParsingKit):
             match = specific_degree_pattern.search(line_text)
             if match:
                 extracted_degree_text = match.group(1).strip()
-                # Clean up common trailing issues if regex is too greedy before a pipe or comma
                 extracted_degree_text = re.sub(r'\s*[|].*$', '', extracted_degree_text).strip() # Remove from pipe
                 extracted_degree_text = extracted_degree_text.rstrip(',').strip()
-                # Further cleanup for abbreviations: B.S. -> BS, M.B.A. -> MBA
+                #Cleanup for abbreviations: B.S. -> BS
                 extracted_degree_text = re.sub(r'\.(?=[A-Z])', '', extracted_degree_text.upper()).replace('.', '')
                 degree_mention = extracted_degree_text
             else:
-                # Fallback: if no specific pattern, check for keywords from EDUCATION_LEVELS
-                # This helps if the format is very simple, e.g., just "Bachelor Degree"
+                # if no specific pattern, check for keywords from EDUCATION_LEVELS
                 sorted_edu_keywords = sorted(kit.EDUCATION_LEVELS.items(), key=lambda item: len(item[0]), reverse=True)
                 for keyword, level in sorted_edu_keywords:
                     pattern = r'\b' + re.escape(keyword) + r'\b'
                     if re.search(pattern, line_lower_processed):
-                        degree_mention = keyword # Store the keyword (e.g., "bachelor")
+                        degree_mention = keyword 
                         break
             
-            # 2. Find Institution on this line
-            # Debug: Uncomment to see what SpaCy recognizes as ORG on this specific line
-            # print(f"DEBUG Education Line: '{line_text}'")
-            # print(f"DEBUG SpaCy Entities: {[(ent.text, ent.label_) for ent in doc_line.ents]}")
-
+            # 2.Find Institution Mention on this line
             potential_institutions_on_line = []
             for ent in doc_line.ents:
                 if ent.label_ == "ORG":
                     ent_text_stripped = ent.text.strip()
-                    # Filter out ORGs that might be part of the degree itself or common noise/headers
+                    # Filter out orgs that might be part of the degree itself or headers
                     if degree_mention and ent_text_stripped.lower() in degree_mention.lower():
                         continue
                     if ent_text_stripped.lower() in ["education", "university", "college", "institute", "school"]:
-                         if len(ent_text_stripped.split()) == 1: continue # Avoid generic terms if they are the whole ORG
+                         if len(ent_text_stripped.split()) == 1: continue 
                     
                     potential_institutions_on_line.append(ent_text_stripped)
             
             if potential_institutions_on_line:
                 best_institution = ""
                 for inst_text in potential_institutions_on_line:
-                    # Prefer institutions that explicitly mention "college", "university", etc.
-                    if any(kw in inst_text.lower() for kw in ["college", "university", "institute", "school"]):
+                    # Prefering institutions that explicitly mention "college", "university" etc
+                    if any(keyword in inst_text.lower() for keyword in ["college", "university", "institute", "school"]):
                         if len(inst_text) > len(best_institution):
                             best_institution = inst_text
                 
                 if best_institution:
                     institution_mention = best_institution
-                else: # If no keyword match, take the longest ORG entity found on the line
-                    institution_mention = max(potential_institutions_on_line, key=len, default="") # default to "" if list empty
+                else:
+                    institution_mention = max(potential_institutions_on_line, key=len, default="") 
                 
                 institution_mention = institution_mention.rstrip(',').strip()
             
-            # Fallback for institution if NER completely missed it (e.g., "BIGTOWN COLLEGE" in your example)
+            # Fallback for institution if NER missed it
             if not institution_mention:
-                # Look for text segments that are likely institutions based on keywords and capitalization
-                # often found after the degree and date, possibly before a location
-                parts_of_line = re.split(r'\s*\|\s*', line_text) # Split by pipe
-                for part in reversed(parts_of_line): # Check from right to left
+                parts_of_line = re.split(r'\s*\|\s*', line_text) 
+                for part in reversed(parts_of_line): 
                     part = part.strip().rstrip(',')
                     if not part: continue
-                    # Check for keywords or if it's a sequence of capitalized words (and not the date itself)
                     if date_mention and part.lower() == date_mention.lower(): continue
                     if degree_mention and part.lower() in degree_mention.lower() : continue
 
                     is_likely_inst = False
-                    if any(kw in part.lower() for kw in ["college", "university", "institute", "school"]):
+                    if any(keyword in part.lower() for keyword in ["college", "university", "institute", "school"]):
                         is_likely_inst = True
-                    else: # Check for capitalized pattern if no keyword
+                    else:
                         words_in_part = part.split()
                         if len(words_in_part) > 0 and len(words_in_part) <= 4: # Reasonable length for an institution name
-                            # Check if it's not a GPE (like CHICAGO, ILLINOIS)
                             doc_part_check = kit.nlp(part)
                             if not any(e.label_ == "GPE" and e.text == part for e in doc_part_check.ents):
                                 if all(word[0].isupper() for word in words_in_part if word.lower() not in ["of", "the", "in", "at", "and"]):
                                     is_likely_inst = True
                     
                     if is_likely_inst:
-                        # Try to remove city/state if appended with comma, e.g., "BIGTOWN COLLEGE, CHICAGO"
+                        #Try to remove city if appended with comma, "BIGTOWN COLLEGE, CHICAGO"
                         inst_candidate = re.sub(r',\s*(?:[A-Z]{2,}|[A-Za-z]+(?:,\s*[A-Z]{2})?)$', '', part).strip()
                         institution_mention = inst_candidate
                         break
 
 
-            # 3. Find Date on this line (more targeted search)
+            # 3. Find Date on this line 
             date_patterns_for_line = [
                 r"((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})\b", # Month YYYY
                 r"\b(\d{4})\b",                                  # YYYY (will be parsed as Jan 1st, YYYY)
@@ -493,41 +436,39 @@ def parse_resume_sections(sections, kit: ParsingKit):
                 date_search_match = re.search(date_pattern_str, line_text, re.IGNORECASE)
                 if date_search_match:
                     found_date_str = date_search_match.group(1)
-                    # Try to parse this specific date string using the robust kit.parse_date
                     parsed_dt_object = kit.parse_date(found_date_str) 
-                    if parsed_dt_object: # If parse_date successfully returns a datetime object
-                        date_mention = found_date_str # Store the original string that was successfully parsed
+                    if parsed_dt_object: 
+                        date_mention = found_date_str 
                         break 
             
-            # Append if we found at least a degree or an institution for this line
+           
             if degree_mention or institution_mention:
                 parsed_resume["education_details"].append({
                     "degree_mention": degree_mention, 
                     "institution_mention": institution_mention,
                     "date_mention": date_mention, 
-                    "text": line_text # Store the original line text for this entry
+                    "text": line_text 
                 })
         
         logging.info(f"Extracted {len(parsed_resume['education_details'])} education details. Highest overall level: {highest_edu_level_found}")
 
-    else: # No "education" section found in the segmented resume
+    else: 
         logging.info("No 'education' section found. Education level remains default.")
-        # parsed_resume["education_level"] = -1 # Already initialized or set by get_education_level
+        
 
 
     #-------Experience Extraction--------
     total_experience_duration_days = 0
-    extracted_companies = set() # To store all unique company names found
+    extracted_companies = set() 
     experience_text = sections.get("experience", "") 
 
-    # Ensure parsed_resume["experience"] list exists
     if "experience" not in parsed_resume or not isinstance(parsed_resume.get("experience"), list):
         parsed_resume["experience"] = []
 
     # COMMON_SECTION_HEADERS is used to avoid misinterpreting section titles as job titles
     COMMON_SECTION_HEADERS = ["experience", "education", "skills", "summary", "objective",
                               "projects", "awards", "references", "publications", "interests",
-                              "activities", "volunteer"] # Add any other common headers
+                              "activities", "volunteer"] 
 
     if experience_text:
         logging.info("Parsing experience from 'experience' section.")
@@ -787,172 +728,14 @@ def parse_resume_sections(sections, kit: ParsingKit):
         parsed_resume["total_years_experience"] = round(total_experience_duration_days / 365.25, 1)
         logging.info(f"Extracted {len(parsed_resume.get('experience', []))} experience entries. Total calculated years: {parsed_resume.get('total_years_experience',0.0)}")
 
-    else: # No experience_text found
+    else: 
         parsed_resume["total_years_experience"] = 0.0
-        if "experience" not in parsed_resume: # Defensive
+        if "experience" not in parsed_resume: 
             parsed_resume["experience"] = []
     
-    # This should be outside the "if experience_text:" block, so it's always populated
     parsed_resume["companies"] = sorted(list(extracted_companies))
     
     
-    """
-    #-------Experience Extraction--------
-    total_experience_duration_days = 0
-    extracted_companies = set()
-    experience_text = sections.get("experience", "")
-
-    if experience_text: 
-        logging.info("Parsing experience from 'experience' section.")
-
-        current_role = {}
-        potential_title_lines = []
-
-        #we are processing line by line not sentence by sentence bc spacy keeps making mistakes while separating sentences
-        for line in experience_text.splitlines():
-            sent_text = line.strip()
-            if not sent_text: continue
-
-            date_range_pattern =  r"(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4})\s*(?:-|–|to|until)\s*(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4}|Present|Current|Now)\b"
-
-            date_match = re.search(date_range_pattern,sent_text,re.IGNORECASE)
-            
-            start_date_obj = None
-            end_date_obj = None
-            company_name = None
-            job_title = None
-
-            if date_match:              
-                start_date_str = date_match.group(1)
-                end_date_str = date_match.group(2)
-
-                start_date_obj = kit.parse_date(start_date_str)
-                end_date_obj = kit.parse_date(end_date_str)
-
-                #if dates are parsed, then we will try to find company title
-                if start_date_obj and end_date_obj:
-                    for ent in kit.nlp(sent_text).ents:
-                        if ent.label_ == "ORG":
-                            company_name = ent.text.strip()
-                            extracted_companies.add(company_name)
-                            break
-                    if company_name and job_title is None: # Check if company was found and title is still missing
-                        try:
-                            # Find where the company name starts in the sentence
-                            company_start_index = sent_text.find(company_name)
-                            # Check if company name was found and isn't at the very beginning
-                            if company_start_index != -1: #it returns -1 if not found
-                                text_before_company = sent_text[:company_start_index].strip()
-                                text_before_company = re.sub(r'[,|]\s*$', '', text_before_company).strip()
-                                if text_before_company and text_before_company[0].isupper():
-                                    job_title = text_before_company 
-                                    #print(f"--> Guessed title from same line: '{job_title}'") 
-                        except Exception as e:
-                            logging.warning(f"Error guessing title from same line: {e}")    
-                    
-                    
-                    if potential_title_lines and job_title is None:
-                        title_line = potential_title_lines[-1]
-                        title_doc = kit.nlp(title_line)
-                        for chunk in title_doc.noun_chunks:
-                            if chunk.text[0].isupper():
-                                job_title = chunk.text
-                                break
-                        if not job_title and title_doc:
-                            #if no chunk worked then we'll use whole line as title guess
-                            job_title = title_doc.text
-
-                    if current_role:
-                            #if we have this then this means that role ended, now we calculate its duration          
-                            prev_start = current_role.get("start_date")
-                            prev_end = current_role.get("end_date")
-                            if prev_end and prev_start:
-                                try:
-                                    duration = relativedelta(prev_end,prev_start)
-                                    total_experience_duration_days += (duration.years * 365.25) + (duration.months * 30.4) + duration.days
-                                except TypeError:
-                                    logging.warning(f"Could not calculate duration for role: {current_role.get('job_title')}")
-                            
-                            logging.debug(f"===> APPENDING final role: {current_role}")
-                            parsed_resume["experience"].append(current_role)
-
-                    
-                    description_from_date_line = ""
-
-                    try:
-                        date_end_index = date_match.end()
-                        #Check if there is actually any text *after* the date pattern on this line.
-                        # Is the end index of the date match *before* the total length of the line?
-                        if date_end_index < len(sent_text):
-                            potential_description = sent_text[date_end_index:].strip()
-                            # This regex removes one or more hyphens, closing parentheses, asterisks
-                            potential_description = re.sub(r'^[-)*\u2022•·\s]+', '', potential_description).strip()
-                            if potential_description:
-                                description_from_date_line = potential_description
-                                logging.debug(f"--> Found description on same line: '{description_from_date_line[:50]}...'")
-                    except Exception as e:
-                        logging.warning(f"Error extracting description from date line: {e}")
-
-
-                    current_role = {
-                        "job_title":job_title,
-                        "company":company_name,
-                        "start_date":start_date_obj,
-                        "end_date":end_date_obj,
-                        "description": description_from_date_line
-                    }  
-                    potential_title_lines = []
-            
-            #sentence does not contain a date range
-            else:
-                is_potential_title = False
-                if len(sent_text.split()) < 7 and any(word[0].isupper() for word in sent_text.split() if len(word)>1):
-                    is_potential_title = True
-
-                    for ent in kit.nlp(sent_text).ents:
-                        if ent.label_ == "ORG":
-                            extracted_companies.add(ent.text.strip())
-                            is_potential_title = False
-                            break
-
-
-                if is_potential_title:
-                    potential_title_lines.append(sent_text)
-                
-                #print(f"IS POTENTIAL TITLE GUESS: {is_potential_title}")
-
-                if not is_potential_title and current_role:
-                    #print(f"APPENDING TO DESCRIPTION for role: {current_role.get('job_title') or current_role.get('company')}") 
-                    current_role["description"] = (current_role.get("description", "") + "\n" + sent_text).strip()
-                    #print(f"New Description: '{current_role['description'][:50]}...'")
-
-                #elif is_potential_title:
-                   # print(f"ADDING TO POTENTIAL TITLE LINES: '{sent_text}'") 
-                #elif not current_role:
-                    #print("SKIPPING (No current role established yet)")
-
-        if current_role:
-            logging.debug(f"\n--- Finalizing Last Role --- LAST ROLE DETAILS: {current_role}")
-            last_start = current_role.get("start_date")
-            last_end = current_role.get("end_date")
-
-            if last_start and last_end:
-                try:
-                    duration = relativedelta(last_end, last_start)
-                    total_experience_duration_days += (duration.years * 365.25) + (duration.months * 30.4) + duration.days
-                except TypeError:
-                     logging.warning(f"Could not calculate duration for last role: {current_role.get('job_title')}")
-            
-            #print(f"===> APPENDING previous role: {current_role}")
-            parsed_resume["experience"].append(current_role)
-
-        parsed_resume["total_years_experience"] = round(total_experience_duration_days / 365.25, 1)
-        logging.info(f"Extracted {len(parsed_resume['experience'])} experience entries. Total calculated years: {parsed_resume['total_years_experience']}")
-
-        """
-    
-        
-
     text_for_contacts = sections.get("header", "")
     if not text_for_contacts: 
          text_for_contacts = "\n".join(sections.values())
@@ -975,9 +758,8 @@ def parse_resume_sections(sections, kit: ParsingKit):
             phones_found.append(cleaned_phone)
     
     if phones_found:
-        parsed_resume["contact_info"]["phones"] = list(set(phones_found)) # Keep unique
+        parsed_resume["contact_info"]["phones"] = list(set(phones_found)) 
         logging.info(f"Found phones: {parsed_resume['contact_info']['phones']}")
-
 
     # Deduplicate companies extracted from experience
     parsed_resume["companies"] = sorted(list(extracted_companies))
@@ -1072,51 +854,6 @@ def parse_resume_file(filepath ,nlp_model_global, tech_skills_list_global, tech_
         return {"error": f"General error during parse_resume_file: {str(e)}", "filepath": filepath}
     
 
-def get_text_from_txt_object(uploaded_file_object):
-    try:
-        raw_text = uploaded_file_object.read().decode('utf-8')
-        logging.info("Successfully read TXT file content.")
-        return raw_text
-    except Exception as e:
-        logging.error(f"Error reading TXT file object: {e}")
-        return None
-
-def get_text_from_docx_object(uploaded_file_object):
-    try:
-        doc = Document(uploaded_file_object) 
-        full_text = [para.text for para in doc.paragraphs]
-        raw_text = '\n'.join(full_text)
-        logging.info("Successfully read DOCX file content.")
-        return raw_text
-    except Exception as e:
-        logging.error(f"Error reading DOCX file object: {e}")
-        return None
-
-def get_text_from_pdf_object(uploaded_file_object):
-    try:
-        full_text = []
-
-        if hasattr(uploaded_file_object, 'seek') and callable(uploaded_file_object.seek):
-            uploaded_file_object.seek(0)
-
-        with pdfplumber.open(uploaded_file_object) as pdf:
-            for page in pdf.pages:
-                extracted_page_text = page.extract_text()
-                if extracted_page_text: 
-                    full_text.append(extracted_page_text)
-        raw_text = '\n'.join(full_text)
-        if not raw_text.strip():
-            file_name_attr = getattr(uploaded_file_object, 'name', 'Uploaded PDF Object')
-            logging.warning(f"No text extracted from PDF: {file_name_attr}")
-            return None 
-        logging.info("Successfully read PDF file content.")
-        return raw_text
-    except Exception as e:
-        file_name_attr = getattr(uploaded_file_object, 'name', 'Uploaded PDF Object')
-        logging.error(f"Error reading PDF file object {file_name_attr}: {e}")
-        return None
-
-
 #Deals with Streamlit's UploadedFile objects (which could be TXT, DOCX, PDF from memory).
 def process_streamlit_file(
         uploaded_file_object,
@@ -1132,7 +869,7 @@ def process_streamlit_file(
 
     if file_type == "text/plain":
         raw_text = get_text_from_txt_object(uploaded_file_object)
-    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document": # DOCX
+    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         raw_text = get_text_from_docx_object(uploaded_file_object)
     elif file_type == "application/pdf":
         raw_text = get_text_from_pdf_object(uploaded_file_object)

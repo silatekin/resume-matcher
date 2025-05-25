@@ -125,28 +125,34 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
 
 
     # ---Education Matching---
-    resume_edu_level = parsed_resume.get('education_level',-1)
-    jd_edu_val = parsed_jd.get('required_education_level',None)
-    jd_edu_level = None
+    resume_edu_level = parsed_resume.get('education_level', -1)  
+    jd_edu_val = parsed_jd.get('required_education_level', None) 
+
+    jd_edu_level = -1 
     education_score = 0.0
 
-    if jd_edu_level is not None:
+    if jd_edu_val is not None:  
         try:
-            jd_edu_level = int(jd_edu_level)
+            jd_edu_level = int(jd_edu_val) 
         except (ValueError, TypeError):
-            logging.warning(f"Matcher: Could not convert JD education level '{jd_edu_val}' to int.")
-            jd_edu_level = -1
+            logging.warning(f"Matcher: Could not convert JD education level '{jd_edu_val}' to int. Using default -1.")
 
-    if jd_edu_level is None or jd_edu_level < 0: 
-        education_score = 0.5 # give more score perhaps?? jd doesn't require or invalid
-    elif resume_edu_level < 0: 
-        education_score = 0.0 
+    
+    if jd_edu_level < 0:  
+        education_score = 0.5
+        logging.info(f"JD requires no specific education level (level code: {jd_edu_level}) or requirement is invalid.")
+    elif resume_edu_level < 0:  
+        education_score = 0.0
+        logging.info("Resume education level unknown, cannot meet requirement.")
     elif resume_edu_level >= jd_edu_level:
         education_score = 1.0
-    else: #resume level below requirement
+        logging.info(f"Resume level ({resume_edu_level}) meets/exceeds JD requirement ({jd_edu_level}).")
+    else:  
         education_score = 0.0
+        logging.info(f"Resume level ({resume_edu_level}) is below JD requirement ({jd_edu_level}).")
+    
     logging.debug(f"MATCHER Education Score: {education_score}, ResumeLvl: {resume_edu_level}, JDLvl: {jd_edu_level}")
-
+   
 
     # Job Title Matching
     jd_title_text = parsed_jd.get('job_title', '')
