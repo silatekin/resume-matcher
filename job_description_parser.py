@@ -63,34 +63,24 @@ tech_skills = load_skills()
 tech_skills_set = set(tech_skills)
 
 SECTION_HEADERS = {
-    "responsibilities": r"(?i)^\s*(responsibilities|what\s*you['’]?ll\s*do|duties|the\s*role|job\s*responsibilities|key\s*responsibilities|day-to-day|your\s*impact)\s*[:]?\s*$",
-    "qualifications": r"(?i)^\s*(qualifications|requirements|minimum\s*qualifications|basic\s*qualifications|required\s*skills|what\s*we['’]?re\s*looking\s*for|who\s*you\s*are|ideal\s*candidate|your\s*profile)\s*[:]?\s*$",
-    "preferred": r"(?i)^\s*(preferred\s*qualifications|Nice-to-Have|bonus\s*points|desired\s*skills|additional\s*qualifications)\s*[:]?\s*",
-    "skills": r"(?i)^\s*(skills|technical\s*skills|technical\s*proficiency|tools|technologies)\s*[:]?\s*$",
+    "about": r"(?i)^\s*(about\s*us|about\s*the\s*company|who\s*we\s*are)\s*[:]?\s*$",
+    "responsibilities": r"(?i)^\s*(responsibilities|what\s*you['’]?ll\s*do|what\s*you\s*will\s*be\s*doing|duties|the\s*role\s*is|role\s*summary|job\s*responsibilities|key\s*responsibilities|day-to-day|your\s*impact)\s*[:]?\s*$",
+    "qualifications": r"(?i)^\s*(qualifications|requirements|minimum\s*qualifications|basic\s*qualifications|required\s*skills|key\s*skills|what\s*we['’]?re\s*looking\s*for|who\s*you\s*are|ideal\s*candidate|your\s*profile|must-have)\s*[:]?\s*$",
+    "preferred": r"(?i)^\s*(preferred\s*qualifications|nice\s*to\s*have|bonus\s*points|desired\s*skills|additional\s*qualifications|good\s*to\s*have)\s*[:]?\s*",
+    "skills": r"(?i)^\s*(skills|technical\s*skills|technical\s*proficiency|tools|technologies|stack)\s*[:]?\s*$",
     "experience": r"(?i)^\s*(experience|work\s*experience|professional\s*experience|employment\s*history|required\s*experience)\s*[:]?\s*$",
     "education": r"(?i)^\s*(education|academic\s*background|educational\s*requirements|education\s*requirements)\s*[:]?\s*$",
-    "about": r"(?i)^\s*(about\s*us|about\s*the\s*company|who\s*we\s*are)\s*[:]?\s*$", 
     "location": r"(?i)^\s*(location|where\s*you['’]?ll\s*work)\s*[:]?\s*",
-    "compensation": r"(?i)^\s*(compensation|salary|pay|benefits|perks)\s*[:]?\s*$",
+    "compensation": r"(?i)^\s*(compensation|salary|pay|benefits|perks|what\s*we\s*offer)\s*[:]?\s*", # Removed trailing $ for more flexibility
 }
 
 EDUCATION_LEVELS = {
-    "phd": 5, "doctorate": 5, "dphil": 5, 
-    "master": 4, "masters": 4, 
-    "msc": 4, "m.sc": 4, "m.s.": 4, "ms": 4, 
-    "mba": 4, "m.b.a": 4,               
-    "meng": 4, "m.eng": 4,               
-    "mtech": 4, "m.tech": 4,           
-    "ma": 4, "m.a.": 4,                  
-    "bachelor": 3, "bachelors": 3,
-    "bsc": 3, "b.sc": 3, "b.s.": 3, "bs": 3, 
-    "beng": 3, "b.eng": 3,                
-    "btech": 3, "b.tech": 3,            
-    "ba": 3, "b.a.": 3,                   
-    "bca": 3,                             
-    "associate": 2, "associates": 2, "aa": 2, "as": 2, 
+    "phd": 5, "doctorate": 5,
+    "master": 4, "masters": 4, "msc": 4, "mba": 4, "meng": 4, "ma": 4, "ms": 4,
+    "bachelor": 3, "bachelors": 3, "bsc": 3, "beng": 3, "ba": 3, "bs": 3,
+    "associate": 2, "associates": 2,
     "college": 1, 
-    "high school": 0, "ged": 0, "diploma": 0 
+    "high school": 0, "ged": 0
 }
 
 def segment_jd(text):
@@ -242,7 +232,8 @@ def parse_jd_sections(sections):
             logging.info("Responsibility section found but text is empty.")
 
             
-    # 4. Process sections.get('qualifications') - maybe look for experience patterns?
+    # 4. Process sections.get('qualifications') 
+    # Extracting Minimum Years of Experience 
     if "qualifications" in sections:
         qualifications_text = sections.get("qualifications", "")
 
@@ -256,6 +247,7 @@ def parse_jd_sections(sections):
             first_years_found = None
 
             print("--- Finding Experience Years ---")
+            
             for line in qualification_lines:
                 stripped_line = line.strip()
                 
@@ -389,28 +381,19 @@ def parse_jd_sections(sections):
         
         
         logging.info("--- Determining LOWEST Education Level Mentioned ---")
-    lowest_level_found = None
-    text_to_search_raw = (sections.get('education', '') + "\n" + sections.get('qualifications', '')).lower()
+        lowest_level_found = None
+        text_to_search = (sections.get('education', '') + "\n" + sections.get('qualifications', '')).lower()
 
-    if text_to_search_raw.strip():
-        text_to_search_cleaned = re.sub(r'\b([a-z])\.(?=[a-z]{1,4}\b|\s|$)', r'\1', text_to_search_raw)
-        text_to_search_cleaned = re.sub(r'\s+', ' ', text_to_search_cleaned).strip() 
+        if text_to_search.strip():
+            for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1]):
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                if re.search(pattern, text_to_search):
+                    lowest_level_found = level
+                    logging.info(f"Found lowest level mention: {keyword} (Level {level})")
+                    break 
 
-        logging.info(f"Cleaned text for education level search: '{text_to_search_cleaned[:200]}...'") 
-
-        # Iterate through EDUCATION_LEVELS, sorted by level value to find the lowest mentioned
-        # (e.g., if "Bachelor's and Master's" is mentioned, it should pick Bachelor's as the minimum requirement)
-        for keyword, level in sorted(EDUCATION_LEVELS.items(), key=lambda item: item[1]):
-            # Use word boundaries for more precise matching
-            pattern = r'\b' + re.escape(keyword) + r'\b'
-            if re.search(pattern, text_to_search_cleaned): # Search in the cleaned text
-                lowest_level_found = level
-                logging.info(f"Found lowest level mention: '{keyword}' (Level {level}) in text.")
-                break  # Stop after finding the first (lowest) level match
-
-    parsed_jd['required_education_level'] = lowest_level_found
-    logging.info(f"Assigned lowest education level mentioned: {lowest_level_found}")
-
+        parsed_jd['required_education_level'] = lowest_level_found 
+        logging.info(f"Assigned lowest education level mentioned: {lowest_level_found}")
 
 
     # 8. Process sections.get('about')
@@ -495,6 +478,109 @@ def parse_jd_file(filepath):
         return None 
 
 
+def process_scraped_job_data(job_description_text, api_title=None, api_company=None, api_location=None, api_tags=None):
+    """
+    Processes a job description string and incorporates metadata from an API/scraped source.
+    This function uses the other parsing functions (clean_text, segment_jd, parse_jd_sections)
+    already defined in this file.
+    """
+    logging.info("Starting processing for a scraped job description with API metadata.")
+    
+    api_title_str = str(api_title) if api_title is not None else ""
+    api_company_str = str(api_company) if api_company is not None else ""
+    api_location_str = str(api_location) if api_location is not None else ""
+
+    if not job_description_text:
+        logging.warning("Received empty job description text. Cannot process.")
+        # Return the basic structure with API data if available, or None
+        if api_title_str or api_company_str or api_location_str: 
+            return {
+                "job_title": api_title_str,
+                "company_name": api_company_str,
+                "location": api_location_str,
+                "about": None,
+                "responsibilities": [],
+                "qualifications": [],
+                "preferred_qualifications": [],
+                "skills": api_tags if api_tags else [],
+                "education": [],
+                "compensation": [],
+                "minimum_years_experience": None,
+                "required_education_level": None
+            }
+        return None
+
+    cleaned_jd_text = clean_text(job_description_text)
+    if not cleaned_jd_text:
+        logging.warning("Cleaned job description text is empty. Cannot process further text analysis.")
+        if api_title_str or api_company_str or api_location_str:
+            return {
+                "job_title": api_title_str,
+                "company_name": api_company_str,
+                "location": api_location_str,
+                "about": None,
+                "responsibilities": [],
+                "qualifications": [],
+                "preferred_qualifications": [],
+                "skills": api_tags if api_tags else [],
+                "education": [],
+                "compensation": [],
+                "minimum_years_experience": None,
+                "required_education_level": None
+            }
+        return None
+
+    sections = segment_jd(cleaned_jd_text) 
+    parsed_data_from_text = parse_jd_sections(sections)
+
+    if api_title_str: 
+        parsed_title_from_text_str = str(parsed_data_from_text.get("job_title", "")) 
+
+        if not parsed_data_from_text.get("job_title") or parsed_data_from_text.get("job_title") == 'N/A' or not parsed_title_from_text_str.strip():
+            parsed_data_from_text["job_title"] = api_title_str
+            logging.info(f"Using API job title: {api_title_str}")
+        elif api_title_str.lower() != parsed_title_from_text_str.lower():
+            logging.info(f"API title '{api_title_str}' differs from parsed title '{parsed_title_from_text_str}'. Prioritizing API title.")
+            parsed_data_from_text["job_title"] = api_title_str
+
+    if api_company_str: 
+        parsed_company_from_text_str = str(parsed_data_from_text.get("company_name", ""))
+
+        if not parsed_data_from_text.get("company_name") or parsed_data_from_text.get("company_name") == 'N/A' or not parsed_company_from_text_str.strip():
+            parsed_data_from_text["company_name"] = api_company_str
+            logging.info(f"Using API company name: {api_company_str}")
+        elif api_company_str.lower() != parsed_company_from_text_str.lower():
+            logging.info(f"API company '{api_company_str}' differs from parsed company '{parsed_company_from_text_str}'. Prioritizing API company.")
+            parsed_data_from_text["company_name"] = api_company_str
+
+    # Location
+    if api_location_str: 
+        parsed_location_from_text_str = str(parsed_data_from_text.get("location", ""))
+        if not parsed_data_from_text.get("location") or parsed_data_from_text.get("location") == 'N/A' or not parsed_location_from_text_str.strip():
+            parsed_data_from_text["location"] = api_location_str
+            logging.info(f"Using API location: {api_location_str}")
+
+    # Integrate API tags with skills found by the parser
+    current_text_skills = set(skill.lower() for skill in parsed_data_from_text.get("skills", []))
+    if api_tags: 
+        for tag in api_tags:
+            if isinstance(tag, str): 
+                current_text_skills.add(tag.lower()) 
+    parsed_data_from_text["skills"] = sorted(list(current_text_skills))
+    if api_tags:
+        logging.info(f"Merged API tags with extracted skills. Total unique skills: {len(parsed_data_from_text['skills'])}")
+    
+    logging.info("Finished processing scraped job data with API enhancements.")
+    return parsed_data_from_text
+
+
+
+
+
+
+
+
+"""
 
 # ==================================================
 #  TESTING BLOCK
@@ -529,3 +615,4 @@ if __name__ == "__main__":
     logging.info("JD Parsing Test Finished.")
 
     
+"""

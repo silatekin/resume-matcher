@@ -465,7 +465,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
     if "experience" not in parsed_resume or not isinstance(parsed_resume.get("experience"), list):
         parsed_resume["experience"] = []
 
-    # COMMON_SECTION_HEADERS is used to avoid misinterpreting section titles as job titles
+    # used to avoid misinterpreting section titles as job titles
     COMMON_SECTION_HEADERS = ["experience", "education", "skills", "summary", "objective",
                               "projects", "awards", "references", "publications", "interests",
                               "activities", "volunteer"] 
@@ -477,20 +477,19 @@ def parse_resume_sections(sections, kit: ParsingKit):
         potential_header_lines = [] # Stores text of lines that might be part of a job header before a date is found
 
         lines = experience_text.splitlines()
-        if lines: # Remove the "Experience" header itself if it's the first line of the section content
+        if lines: 
             first_line_cleaned_for_header_check = lines[0].strip().lower()
-            # Check against various ways the "experience" header might be written
             if any(keyword in first_line_cleaned_for_header_check for keyword in ["experience", "work experience", "employment history", "professional experience"]):
-                # More specific check: if it's JUST the header
-                if len(first_line_cleaned_for_header_check.split()) <= 3: # "Experience" or "Work Experience"
+                #line below is for when a header is short and better to remove like "Professional Experience"
+                #if line is longer like "My Relevant Professional Experience and Accomplishments" then we want to keep it
+                if len(first_line_cleaned_for_header_check.split()) <= 3: 
                     lines = lines[1:]
 
         for line_content in lines:
             sent_text = line_content.strip()
-            if not sent_text: # Skip empty lines
+            if not sent_text: 
                 continue
 
-            # Regex to find date ranges (e.g., "Month YYYY - Month YYYY" or "Month YYYY - Present")
             date_range_pattern = r"(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4})\s*(?:-|–|to|until)\s*(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}|\d{4}|\d{1,2}/\d{4}|Present|Current|Now)\b"
             date_match = re.search(date_range_pattern, sent_text, re.IGNORECASE)
             
@@ -498,7 +497,9 @@ def parse_resume_sections(sections, kit: ParsingKit):
 
             if line_is_date:
                 # Date line found: this anchors a new role or is part of the current role's header.
-                # Finalize the PREVIOUS role if it was being built and had a start date.
+                # If current_role already has a "start_date", it means we were in the middle
+                # of collecting information for a previous job. Since we've now hit a new date line
+                # the previous job entry must be complete.
                 if current_role.get("start_date"):
                     prev_start = current_role.get("start_date")
                     prev_end = current_role.get("end_date")
@@ -509,12 +510,11 @@ def parse_resume_sections(sections, kit: ParsingKit):
                         except TypeError:
                             logging.warning(f"Could not calculate duration for role: {current_role.get('job_title') or current_role.get('company')}")
                     
-                    # Append if it has at least a title, company or a valid date
                     if current_role.get("job_title") or current_role.get("company") or (prev_start and prev_end) :
                         parsed_resume["experience"].append(current_role)
                         logging.debug(f"===> Appended role (due to new date line): {current_role.get('job_title') or current_role.get('company')}")
                 
-                current_role = {} # Reset for the new role defined by this date line
+                current_role = {} 
                 new_job_title = None
                 new_company_name = None
 
@@ -536,10 +536,13 @@ def parse_resume_sections(sections, kit: ParsingKit):
                 
                 # Attempt to extract Title/Company from the text BEFORE the date on the current line
                 if text_before_date_on_date_line:
+                    # Sometimes people format like: "Job Title | Company Name" before the dates.
+                    # This line splits that text by "|" and also strips spaces from each part.
+                    # "  Job Title | Company  " becomes ["Job Title", "Company"]
                     parts = [p.strip() for p in text_before_date_on_date_line.split('|') if p.strip()]
                     
                     # Try to assign title and company based on pipe splitting
-                    if len(parts) >= 1 : # Must have at least one part
+                    if len(parts) >= 1 : 
                         # Heuristic: if two parts, assume Title | Company. If one part, could be Title or Company.
                         # Use NER to help disambiguate.
                         
@@ -549,24 +552,25 @@ def parse_resume_sections(sections, kit: ParsingKit):
                         doc_part1 = kit.nlp(part1_text) if part1_text else None
                         doc_part2 = kit.nlp(part2_text) if part2_text else None
 
+                        # Analyzing these parts with spacy to see if they are recognized as Organizations(ORG)
                         is_part1_org = any(ent.label_ == "ORG" for ent in (doc_part1.ents if doc_part1 else []))
                         is_part2_org = any(ent.label_ == "ORG" for ent in (doc_part2.ents if doc_part2 else []))
 
                         if len(parts) == 2:
-                            if is_part2_org and not is_part1_org: # Title | Company (ORG)
+                            if is_part2_org and not is_part1_org: # Title|Company(ORG)
                                 new_job_title = part1_text
                                 new_company_name = part2_text
-                            elif is_part1_org and not is_part2_org: # Company (ORG) | Title
+                            elif is_part1_org and not is_part2_org: # Company(ORG)|Title
                                 new_company_name = part1_text
                                 new_job_title = part2_text
                             elif is_part1_org and is_part2_org: # Both ORG, assume Title | Company
                                 new_job_title = part1_text
                                 new_company_name = part2_text
-                            else: # Neither clearly ORG by NER, assume Title | Company
+                            else: # Neither clearly ORG by NER, assume Title|Company
                                 new_job_title = part1_text
                                 new_company_name = part2_text
                         elif len(parts) == 1:
-                            # Only one part. Could be title or company. Use NER.
+                            # Only one part. Could be title or company, Using NER
                             if is_part1_org:
                                 new_company_name = part1_text
                                 # Title might be in potential_header_lines
@@ -574,7 +578,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
                                 new_job_title = part1_text
                                 # Company might be in potential_header_lines or next line
 
-                    # If pipe splitting didn't yield company, try NER on the whole pre-date text
+                    # If pipe splitting didn't result a company,  NER will be checked on the whole pre-date text
                     if not new_company_name:
                         doc_before_date = kit.nlp(text_before_date_on_date_line)
                         for ent in doc_before_date.ents:
@@ -582,9 +586,8 @@ def parse_resume_sections(sections, kit: ParsingKit):
                                 # Avoid very long ORG entities that are likely misclassifications
                                 if len(ent.text.split()) < 7:
                                     new_company_name = ent.text.strip()
-                                    break # Take the first plausible ORG
+                                    break 
                     
-                    # If pipe splitting didn't yield title, but we got a company from NER
                     if not new_job_title and new_company_name:
                         company_idx = text_before_date_on_date_line.lower().find(new_company_name.lower())
                         if company_idx > 0: # Company name is not at the start
@@ -603,8 +606,8 @@ def parse_resume_sections(sections, kit: ParsingKit):
 
                 # 2. If title or company still missing, use potential_header_lines (lines before this date line)
                 if not new_job_title or not new_company_name:
-                    for header_line_text in reversed(potential_header_lines): # Process most recent first
-                        if new_job_title and new_company_name: break # Both found
+                    for header_line_text in reversed(potential_header_lines): 
+                        if new_job_title and new_company_name: break 
 
                         doc_header = kit.nlp(header_line_text)
                         temp_header_company = None
@@ -614,7 +617,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
                                 if ent.label_ == "ORG":
                                     if len(ent.text.split()) < 7: # Avoid overly long ORGs
                                         new_company_name = ent.text.strip()
-                                        temp_header_company = new_company_name # Mark company found on this line
+                                        temp_header_company = new_company_name 
                                         break
                         
                         if not new_job_title:
@@ -634,7 +637,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
                                len(title_candidate_from_header.split()) < 7:
                                 new_job_title = title_candidate_from_header
                 
-                if new_company_name: # Add to global set of companies
+                if new_company_name: 
                     extracted_companies.add(new_company_name)
 
                 current_role = {
@@ -642,11 +645,11 @@ def parse_resume_sections(sections, kit: ParsingKit):
                     "company": new_company_name,
                     "start_date": start_date_obj,
                     "end_date": end_date_obj,
-                    "description": description_from_date_line # Start with desc from date line
+                    "description": description_from_date_line 
                 }
                 potential_header_lines = [] # Clear buffer as we've anchored a role
 
-            else: # Line is NOT a date line
+            else: 
                 # Could be a standalone header line (Title/Company on its own) or a description line.
                 is_this_line_a_new_standalone_header = False
                 
@@ -657,7 +660,6 @@ def parse_resume_sections(sections, kit: ParsingKit):
                     temp_company_sh = None
                     
                     doc_line = kit.nlp(sent_text)
-                    # Check for ORG for company
                     for ent in doc_line.ents:
                         if ent.label_ == "ORG" and len(ent.text.split()) < 7:
                             temp_company_sh = ent.text.strip() # Potential company
@@ -677,7 +679,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
                            len(sent_text.split()) < 7:
                             temp_title_sh = sent_text
                     
-                    if temp_title_sh or temp_company_sh: # If we found either a title or company
+                    if temp_title_sh or temp_company_sh: 
                         is_this_line_a_new_standalone_header = True
 
                 if is_this_line_a_new_standalone_header:
@@ -697,27 +699,24 @@ def parse_resume_sections(sections, kit: ParsingKit):
                              logging.debug(f"===> Appended role (new standalone header found): {current_role.get('job_title') or current_role.get('company')}")
                         current_role = {} # Reset, as this header implies a new role context
                     
-                    potential_header_lines.append(sent_text) # Add this line to buffer for next date line
+                    potential_header_lines.append(sent_text) 
                 
                 elif current_role.get("start_date"): # Line is not a date, not a new standalone header, APPEND to current role's description
                     current_role["description"] = (current_role.get("description", "") + "\n" + sent_text).strip()
                 
-                else: # No role active (no start_date yet), and not a date line, and not a clear new header. Add to buffer.
-                      # This could be part of a multi-line header before any date is encountered.
+                else: 
                     potential_header_lines.append(sent_text)
 
-        # After the loop, finalize the last current_role if it exists and has data
         if current_role.get("start_date") or current_role.get("job_title") or current_role.get("company"): # Check if there's anything to save
             last_start = current_role.get("start_date")
             last_end = current_role.get("end_date")
-            if last_start and last_end: # Only add to duration if dates are valid
+            if last_start and last_end: 
                 try:
                     duration = relativedelta(last_end, last_start)
                     total_experience_duration_days += (duration.years * 365.25) + (duration.months * 30.4) + duration.days
                 except TypeError:
                     logging.warning(f"Could not calculate duration for last role: {current_role.get('job_title') or current_role.get('company')}")
             
-            # Append if it has at least a title, company or a valid date pair
             if current_role.get("job_title") or current_role.get("company") or (last_start and last_end):
                  parsed_resume["experience"].append(current_role)
                  logging.debug(f"===> Appended FINAL role: {current_role.get('job_title') or current_role.get('company')}")
@@ -750,7 +749,6 @@ def parse_resume_sections(sections, kit: ParsingKit):
         logging.info(f"Found emails: {parsed_resume['contact_info']['emails']}")
     
     phones_found = []
-    # Use finditer to get match objects
     for match in re.finditer(phone_pattern, text_for_contacts):
         full_match = match.group(0) 
         cleaned_phone = re.sub(r'[-.\s()]', '', full_match) 
@@ -761,16 +759,12 @@ def parse_resume_sections(sections, kit: ParsingKit):
         parsed_resume["contact_info"]["phones"] = list(set(phones_found)) 
         logging.info(f"Found phones: {parsed_resume['contact_info']['phones']}")
 
-    # Deduplicate companies extracted from experience
-    parsed_resume["companies"] = sorted(list(extracted_companies))
-
     for section_name, text_content in sections.items():
-        if text_content and isinstance(text_content, str): # Ensure content exists and is a string
+        if text_content and isinstance(text_content, str): 
             doc = kit.nlp(text_content)
             for ent in doc.ents:
                 parsed_resume["raw_entities"][ent.label_].append(ent.text.strip())
     
-    # Deduplicate all raw entities collected
     for label in parsed_resume["raw_entities"]:
         parsed_resume["raw_entities"][label] = sorted(list(set(parsed_resume["raw_entities"][label])))
     
@@ -854,7 +848,6 @@ def parse_resume_file(filepath ,nlp_model_global, tech_skills_list_global, tech_
         return {"error": f"General error during parse_resume_file: {str(e)}", "filepath": filepath}
     
 
-#Deals with Streamlit's UploadedFile objects (which could be TXT, DOCX, PDF from memory).
 def process_streamlit_file(
         uploaded_file_object,
         nlp_ref,
