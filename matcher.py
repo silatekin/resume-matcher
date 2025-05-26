@@ -2,6 +2,7 @@ import spacy
 import logging
 import string
 import re
+import pandas as pd
 
 
 STOP_WORDS = set([
@@ -77,8 +78,9 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
     num_jd_skills = len(jd_skills_set)
     skill_score_confidence = 1.0 # Default confidence
     
-    # Define a threshold for what you consider a 'decent' number of skills in a JD
-    MIN_SKILLS_FOR_FULL_CONFIDENCE = 4 # Example: need at least 4 skills for full confidence in the score
+    # Defininig a threshold for number of skills in a JD
+    # need at least 4 skills for full confidence in the score
+    MIN_SKILLS_FOR_FULL_CONFIDENCE = 4 
     
     if num_jd_skills > 0 and num_jd_skills < MIN_SKILLS_FOR_FULL_CONFIDENCE:
         # Scale down the confidence if fewer than threshold skills are in the JD
@@ -86,7 +88,7 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
         # Example: if JD has 1 skill, confidence = 1/4 = 0.25
         # Example: if JD has 2 skills, confidence = 2/4 = 0.5
     elif num_jd_skills == 0:
-        skill_score_confidence = 0.0 # No skills in JD, no confidence in skill match
+        skill_score_confidence = 0.0 
 
     skill_score = raw_skill_score * skill_score_confidence
     # --- End of Tempering Logic ---
@@ -94,13 +96,6 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
     logging.debug(f"MATCHER Skill Score: {skill_score:.2f} (Raw: {raw_skill_score:.2f}, Confidence: {skill_score_confidence:.2f}), "
                   f"Matching: {matching_skills_set}, Resume: {resume_skills_set}, JD: {jd_skills_set}")
 
-    """
-    if(len(jd_skills_set)) > 0:
-        skill_score=len(matching_skills_set)/len(jd_skills_set)
-    else:
-        skill_score = 0.0 #if jd lists have no skills
-
-    """
 
     #---Experience Years Matching---
     resume_experience_years = parsed_resume.get('total_years_experience',0)
@@ -155,7 +150,9 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
    
 
     # Job Title Matching
-    jd_title_text = parsed_jd.get('job_title', '')
+    jd_title_raw = parsed_jd.get('job_title', '')
+    jd_title_text = str(jd_title_raw) if pd.notna(jd_title_raw) else ""
+
     resume_experience_list = parsed_resume.get('experience', [])
     title_score = 0.0
     matching_resume_titles_found = []
@@ -166,10 +163,9 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
     ]
 
     if not jd_title_text.strip(): title_score = 0.5
-    # Use the passed-in nlp_model for similarity; ensure it has vectors
     elif nlp_model is None or not hasattr(nlp_model, 'vocab') or not nlp_model.vocab.has_vector:
         logging.warning("MATCHER: Passed NLP model for titles has no vectors or is None. Falling back to Jaccard.")
-        jd_title_tokens = clean_and_tokenize(jd_title_text, nlp_model) # Pass nlp_model for tokenization
+        jd_title_tokens = clean_and_tokenize(jd_title_text, nlp_model) 
         max_jaccard_score = 0.0
         if jd_title_tokens and resume_experience_list:
             for exp_entry_outer in resume_experience_list:
@@ -186,7 +182,7 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
                             elif jaccard == max_jaccard_score and max_jaccard_score > 0 and resume_title_text not in matching_resume_titles_found:
                                 matching_resume_titles_found.append(resume_title_text)
             title_score = max_jaccard_score
-    else: # Use spaCy document similarity
+    else: 
         jd_doc = nlp_model(jd_title_text)
         max_similarity_score = 0.0
         if resume_experience_list:
@@ -210,14 +206,13 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
 
     # --- Keyword Matching
     jd_keyword_text_parts = []
-    # Key JD sections for keywords
     jd_text_sources = ['responsibilities', 'qualifications', 'preferred_qualifications', 
                        'skills_text_raw_kaggle', 'job_description_text_raw_kaggle', 'job_title'] # Added job_title
     for key in jd_text_sources:
         content = parsed_jd.get(key)
-        if isinstance(content, list): # e.g., responsibilities, qualifications
+        if isinstance(content, list): # e.g responsibilities, qualifications
             jd_keyword_text_parts.extend([str(item) for item in content if isinstance(item, str)])
-        elif isinstance(content, str): # e.g., raw text fields, job_title
+        elif isinstance(content, str): # e.g raw text fields, job_title
             jd_keyword_text_parts.append(content)
     # Also add JD skills list as text
     if parsed_jd.get('skills'):
@@ -249,7 +244,6 @@ def calculate_match_score(parsed_resume,parsed_jd,nlp_model):
 
     matching_keyword_tokens_set = jd_keyword_tokens.intersection(resume_keyword_tokens)
     # Filter out very common words that might have slipped through basic stop word lists if NLP_TOKENIZER failed
-    # This is an additional safeguard.
     common_generic_words = {'role', 'team', 'work', 'experience', 'responsibilities', 'requirements', 'skills', 'job', 'position'}
     final_matching_keywords = matching_keyword_tokens_set - common_generic_words
     matching_keywords_list = sorted(list(final_matching_keywords))
