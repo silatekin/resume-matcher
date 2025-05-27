@@ -14,3 +14,4 @@ load_job_descriptions
 experiencev1.txt
 debug_matcher
 parsed_resume_output
+tests/data/raw_resumes/

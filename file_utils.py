@@ -1,6 +1,7 @@
 import logging
 from docx import Document 
 import pdfplumber
+import fitz
 
 def read_text_file(file_path):
     try:
@@ -34,7 +35,7 @@ def read_docx_file(file_path):
 def read_pdf_file(file_path):
     full_text = []
     try: 
-        with pdfplumber.open(file_path) as pdf:
+        with fitz.open(file_path) as pdf:
             for page in pdf.pages:
                 extracted_page_text = page.extract_text()
                 if extracted_page_text:
@@ -73,6 +74,38 @@ def get_text_from_docx_object(uploaded_file_object):
         return raw_text
     except Exception as e:
         logging.error(f"Error reading DOCX file object: {e}")
+        return None
+
+def get_text_from_pdf_object_fitz(uploaded_file_object):
+    full_text = []
+    try:
+        if hasattr(uploaded_file_object, 'seek') and callable(uploaded_file_object.seek):
+            uploaded_file_object.seek(0)
+        
+        pdf_bytes = uploaded_file_object.read() 
+
+
+        if hasattr(uploaded_file_object, 'seek') and callable(uploaded_file_object.seek):
+             uploaded_file_object.seek(0) 
+
+        with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+            for page_num in range(len(doc)):
+                page = doc.load_page(page_num)
+                extracted_page_text = page.get_text("text")
+                if extracted_page_text: 
+                    full_text.append(extracted_page_text.strip())
+        
+        raw_text = '\n'.join(filter(None, full_text))
+
+        if not raw_text.strip():
+            file_name_attr = getattr(uploaded_file_object, 'name', 'Uploaded PDF Object')
+            logging.warning(f"PyMuPDF: No text extracted from PDF: {file_name_attr}")
+            return None 
+        logging.info(f"PyMuPDF: Successfully read PDF file content from object: {getattr(uploaded_file_object, 'name', '')}")
+        return raw_text
+    except Exception as e:
+        file_name_attr = getattr(uploaded_file_object, 'name', 'Uploaded PDF Object')
+        logging.error(f"PyMuPDF Error reading PDF file object {file_name_attr}: {e}")
         return None
 
 def get_text_from_pdf_object(uploaded_file_object):

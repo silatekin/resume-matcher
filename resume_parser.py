@@ -290,7 +290,6 @@ def parse_resume_sections(sections, kit: ParsingKit):
             for i in range(start, end):
                 matched_indices.add(i)
 
-        # Token matching for single-word skills only if the token wasn't already part of a phrase match
         for token in skills_doc:
             if token.i not in matched_indices: 
                 if token.lemma_.lower() in kit.tech_skills_set:
@@ -303,158 +302,130 @@ def parse_resume_sections(sections, kit: ParsingKit):
         logging.info(f"Extracted {len(parsed_resume['skills'])} unique skills.")
     
     #---Education Extraction-----
-    if "education_details" not in parsed_resume or not isinstance(parsed_resume.get("education_details"), list):
-        parsed_resume["education_details"] = []
-    if "education_level" not in parsed_resume:
-        parsed_resume["education_level"] = -1
+    parsed_resume["education_details"] = []
+    parsed_resume["education_level"] = -1
 
     if "education" in sections:
         education_text = sections["education"]
-        highest_edu_level_found = kit.get_education_level(education_text)
-        parsed_resume["education_level"] = highest_edu_level_found
+        parsed_resume["education_level"] = kit.get_education_level(education_text)
         
-        # splitting the education section
-        potential_degree_lines = [line.strip() 
-                                  for line in education_text.splitlines()
-                                    if line.strip()]
+        potential_lines = [line.strip() for line in education_text.splitlines() if line.strip()]
+        if potential_lines and potential_lines[0].lower() == "education": # Remove header if it's part of the text
+            potential_lines = potential_lines[1:]
+
+        all_parsed_entries = []
+        current_entry_data = {}
         
-        # if "Education" header is the first line of the content
-        if potential_degree_lines and potential_degree_lines[0].lower() == "education":
-            potential_degree_lines = potential_degree_lines[1:]
+        specific_degree_pattern = re.compile(
+            r"""
+          
+            \b(
+                (?:Bachelor|Master|Associate|Doctor(?:ate)?)\s*
+                (?:of|in|of\sScience|of\sArts|of\sBusiness\sAdministration|of\sEngineering|of\sPhilosophy)?\s* (?:in\s+)?[\w\s\(\)\-\.,'&]+? 
+                | 
+                (?:B\.?S\.?C?|M\.?S\.?C?|M\.?B\.?A\.?|M\.A\.|A\.?A\.?S?|Ph\.?D\.?|B\.?Eng\.?|M\.?Eng\.?) 
+                (?:\s*(?:in|of)\s+[\w\s\(\)\-\.,'&]+?)? 
+            )\b
+            """, 
+            re.IGNORECASE | re.VERBOSE
+        )
 
-        for line_text in potential_degree_lines:
-            if not line_text: 
-                continue
+        def _finalize_entry(entry_data):
+            if entry_data and (entry_data.get("degree_mention") or entry_data.get("institution_mention")):
+                entry_data["text"] = "\n".join(entry_data.get("text_lines", [])).strip()
+                if "text_lines" in entry_data: del entry_data["text_lines"]
+                all_parsed_entries.append(entry_data)
+            return {}
 
-            doc_line = kit.nlp(line_text) 
+        for line_text in potential_lines:
+            doc_line = kit.nlp(line_text)
+            line_lower_processed = line_text.lower().replace('\xa0', ' ').replace('', '').strip()
+            line_lower_processed = re.sub(r'\b([a-z])\.', r'\1', line_lower_processed)
 
-            # for this specific line
-            degree_mention = None
-            institution_mention = None
-            date_mention = None 
-            
-            line_lower_processed = line_text.lower().replace('\xa0', ' ') 
-            line_lower_processed = re.sub(r'\b([a-z])\.', r'\1', line_lower_processed) # Remove periods from B.S. -> bs
-
-            # 1.Find Degree Mention on this line
-            # This pattern tries to capture both abbreviations and fuller names with fields of study
-            #goes from B.S. in Computer Science | Minor in Fun, --> B.S. in Computer Science
-            specific_degree_pattern = re.compile(
-                r"""
-                #first we check full degree names
-                \b(
-                    (?:Bachelor|Master|Associate|Doctor(?:ate)?)\s*
-                    (?:of|in|of\sScience|of\sArts|of\sBusiness\sAdministration|of\sEngineering|of\sPhilosophy)?\s* 
-                    (?:in\s+)?[\w\s\(\)\-\.,'&]+?  
-                    |                                   
-                    (?:B\.?S\.?C?|M\.?S\.?C?|M\.?B\.?A\.?|M\.A\.|A\.?A\.?S?|Ph\.?D\.?|B\.?Eng\.?|M\.?Eng\.?) 
-                    (?:\s*(?:in|of)\s+[\w\s\(\)\-\.,'&]+?)? 
-                )\b
-                """, 
-                re.IGNORECASE | re.VERBOSE
-            )
-            
+            # --- Extract potential components from the current line ---
+            line_degree = None
             match = specific_degree_pattern.search(line_text)
             if match:
-                extracted_degree_text = match.group(1).strip()
-                extracted_degree_text = re.sub(r'\s*[|].*$', '', extracted_degree_text).strip() # Remove from pipe
-                extracted_degree_text = extracted_degree_text.rstrip(',').strip()
-                #Cleanup for abbreviations: B.S. -> BS
-                extracted_degree_text = re.sub(r'\.(?=[A-Z])', '', extracted_degree_text.upper()).replace('.', '')
-                degree_mention = extracted_degree_text
+                temp_degree = match.group(1).strip()
+                temp_degree = re.sub(r'\s*[|].*$', '', temp_degree).strip().rstrip(',').strip()
+                line_degree = re.sub(r'\.(?=[A-Z])', '', temp_degree.upper()).replace('.', '')
             else:
-                # if no specific pattern, check for keywords from EDUCATION_LEVELS
-                sorted_edu_keywords = sorted(kit.EDUCATION_LEVELS.items(), key=lambda item: len(item[0]), reverse=True)
-                for keyword, level in sorted_edu_keywords:
-                    pattern = r'\b' + re.escape(keyword) + r'\b'
-                    if re.search(pattern, line_lower_processed):
-                        degree_mention = keyword 
-                        break
-            
-            # 2.Find Institution Mention on this line
-            potential_institutions_on_line = []
+                if any(kw in line_lower_processed for kw in ["bachelor", "master", "doctorate", "phd", "b.s", "m.s", "b.a", "m.a"]):
+                     pass 
+
+            line_institution_entities = []
             for ent in doc_line.ents:
                 if ent.label_ == "ORG":
-                    ent_text_stripped = ent.text.strip()
-                    # Filter out orgs that might be part of the degree itself or headers
-                    if degree_mention and ent_text_stripped.lower() in degree_mention.lower():
-                        continue
-                    if ent_text_stripped.lower() in ["education", "university", "college", "institute", "school"]:
-                         if len(ent_text_stripped.split()) == 1: continue 
-                    
-                    potential_institutions_on_line.append(ent_text_stripped)
+                    ent_text = ent.text.strip()
+                    is_part_of_degree = line_degree and ent_text.lower() in line_degree.lower()
+                    is_generic = ent_text.lower() in ["education", "university", "college", "institute", "school"] and len(ent_text.split()) == 1
+                    if not is_part_of_degree and not is_generic:
+                        line_institution_entities.append(ent_text)
             
-            if potential_institutions_on_line:
-                best_institution = ""
-                for inst_text in potential_institutions_on_line:
-                    # Prefering institutions that explicitly mention "college", "university" etc
-                    if any(keyword in inst_text.lower() for keyword in ["college", "university", "institute", "school"]):
-                        if len(inst_text) > len(best_institution):
-                            best_institution = inst_text
+            line_institution = None
+            if line_institution_entities:
+                best_inst = ""
+                for inst_text in line_institution_entities:
+                    if any(keyword in inst_text.lower() for keyword in ["college", "university", "institute","school"]):
+                        if len(inst_text) > len(best_inst): best_inst = inst_text
+                if best_inst: line_institution = best_inst
+                else: line_institution = max(line_institution_entities, key=len, default="").rstrip(',').strip()
+            
+            line_date = None
+            date_match_year_only = re.search(r"\b(\d{4})\b", line_text)
+            date_match_month_year = re.search(r"((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})\b", line_text, re.IGNORECASE)
+            
+            if date_match_month_year:
+                if kit.parse_date(date_match_month_year.group(1)): line_date = date_match_month_year.group(1)
+            elif date_match_year_only:
+                 if kit.parse_date(date_match_year_only.group(1)): line_date = date_match_year_only.group(1)
+
+
+            is_new_entry_anchor = False
+            if line_degree: 
+                is_new_entry_anchor = True
+            elif line_institution and any(k in line_institution.lower() for k in ["university", "college", "institute"]):
+                is_new_entry_anchor = True
+            elif not current_entry_data and any(kw in line_lower_processed for kw in ["bachelor of", "master of", "b.s.", "m.s.", "ph.d."]): # Start of a new degree phrase
+                is_new_entry_anchor = True
+
+
+            if is_new_entry_anchor:
+    
+                if current_entry_data.get("degree_mention") or current_entry_data.get("institution_mention"):
+                    current_entry_data = _finalize_entry(current_entry_data) 
                 
-                if best_institution:
-                    institution_mention = best_institution
-                else:
-                    institution_mention = max(potential_institutions_on_line, key=len, default="") 
+                if line_degree: current_entry_data["degree_mention"] = line_degree
+                if line_institution: current_entry_data["institution_mention"] = line_institution
+                if line_date: current_entry_data["date_mention"] = line_date
+                current_entry_data["text_lines"] = [line_text]
+            
+            elif current_entry_data: 
+                if line_date and not current_entry_data.get("date_mention"):
+                    current_entry_data["date_mention"] = line_date
+                if line_degree and not current_entry_data.get("degree_mention"): 
+                    current_entry_data["degree_mention"] = line_degree
+                if line_institution and not current_entry_data.get("institution_mention"):
+                    current_entry_data["institution_mention"] = line_institution
                 
-                institution_mention = institution_mention.rstrip(',').strip()
-            
-            # Fallback for institution if NER missed it
-            if not institution_mention:
-                parts_of_line = re.split(r'\s*\|\s*', line_text) 
-                for part in reversed(parts_of_line): 
-                    part = part.strip().rstrip(',')
-                    if not part: continue
-                    if date_mention and part.lower() == date_mention.lower(): continue
-                    if degree_mention and part.lower() in degree_mention.lower() : continue
+                current_entry_data.setdefault("text_lines", []).append(line_text)
+            else:
 
-                    is_likely_inst = False
-                    if any(keyword in part.lower() for keyword in ["college", "university", "institute", "school"]):
-                        is_likely_inst = True
-                    else:
-                        words_in_part = part.split()
-                        if len(words_in_part) > 0 and len(words_in_part) <= 4: # Reasonable length for an institution name
-                            doc_part_check = kit.nlp(part)
-                            if not any(e.label_ == "GPE" and e.text == part for e in doc_part_check.ents):
-                                if all(word[0].isupper() for word in words_in_part if word.lower() not in ["of", "the", "in", "at", "and"]):
-                                    is_likely_inst = True
-                    
-                    if is_likely_inst:
-                        #Try to remove city if appended with comma, "BIGTOWN COLLEGE, CHICAGO"
-                        inst_candidate = re.sub(r',\s*(?:[A-Z]{2,}|[A-Za-z]+(?:,\s*[A-Z]{2})?)$', '', part).strip()
-                        institution_mention = inst_candidate
-                        break
+                if line_date: 
+ 
+                    if not current_entry_data: 
+                         current_entry_data["date_mention"] = line_date
+                         current_entry_data["text_lines"] = [line_text]
 
 
-            # 3. Find Date on this line 
-            date_patterns_for_line = [
-                r"((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})\b", # Month YYYY
-                r"\b(\d{4})\b",                                  # YYYY (will be parsed as Jan 1st, YYYY)
-                r"(\d{1,2}/\d{4})\b"                             # MM/YYYY
-            ]
-            for date_pattern_str in date_patterns_for_line:
-                date_search_match = re.search(date_pattern_str, line_text, re.IGNORECASE)
-                if date_search_match:
-                    found_date_str = date_search_match.group(1)
-                    parsed_dt_object = kit.parse_date(found_date_str) 
-                    if parsed_dt_object: 
-                        date_mention = found_date_str 
-                        break 
-            
-           
-            if degree_mention or institution_mention:
-                parsed_resume["education_details"].append({
-                    "degree_mention": degree_mention, 
-                    "institution_mention": institution_mention,
-                    "date_mention": date_mention, 
-                    "text": line_text 
-                })
-        
-        logging.info(f"Extracted {len(parsed_resume['education_details'])} education details. Highest overall level: {highest_edu_level_found}")
+        current_entry_data = _finalize_entry(current_entry_data) 
+        parsed_resume["education_details"] = all_parsed_entries
+        logging.info(f"Extracted {len(all_parsed_entries)} education details (new logic). Highest overall level: {parsed_resume['education_level']}")
 
-    else: 
+    else:
         logging.info("No 'education' section found. Education level remains default.")
-        
+        parsed_resume["education_details"] = []
+        parsed_resume["education_level"] = -1
 
 
     #-------Experience Extraction--------
