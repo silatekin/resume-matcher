@@ -1,51 +1,44 @@
 import streamlit as st
-# --- Page Configuration MUST be the first Streamlit command ---
 st.set_page_config(layout="wide", page_title="Find Matching Candidates")
 
 import json
 import os
 import logging
 import re 
-import spacy # For NLP model loading
+import spacy 
 
-# --- Assuming your matcher is accessible ---
 from matcher import calculate_match_score 
 
-# --- Define Base Directory (useful for finding files) ---
 PAGE_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_ROOT_DIR = os.path.dirname(PAGE_BASE_DIR) 
 
-# --- Path to your FOLDER of pre-parsed resume JSON files ---
 PARSED_RESUMES_FOLDER_PATH = os.path.join(APP_ROOT_DIR, "tests", "data", "resumes") 
 
-# --- Basic Logging ---
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s'
 )
 
-# --- Load NLP Model (Cached) - More Robust Error Handling ---
 @st.cache_resource
 def get_nlp_model_for_page():
     try:
         model = spacy.load("en_core_web_md") 
         logging.info("FindCandidatesPage: spaCy NLP model 'en_core_web_md' loaded.")
         return model
-    except OSError: # Specific error for model not found
+    except OSError: 
         logging.error("FindCandidatesPage: spaCy model 'en_core_web_md' not found. Please run: python -m spacy download en_core_web_md")
         return None 
-    except Exception as e: # Catch any other potential errors during spacy.load
+    except Exception as e: 
         logging.error(f"FindCandidatesPage: An unexpected error occurred while loading spaCy model: {e}")
         return None
 
 
-# --- Load Parsed Resumes (Cached) ---
+
 @st.cache_data 
 def load_all_parsed_resumes_from_folder(folder_path):
     logging.info(f"FindCandidatesPage: Attempting to load all PARSED RESUMES from FOLDER: {folder_path}")
     all_resumes = []
     if not os.path.isdir(folder_path):
-        # This error will be displayed in the main UI body later
         logging.error(f"FindCandidatesPage: Parsed resumes folder not found: {folder_path}")
         return []
 
@@ -69,11 +62,9 @@ def load_all_parsed_resumes_from_folder(folder_path):
             logging.warning(f"FindCandidatesPage: No PARSED RESUME JSON files found or loaded from {folder_path}.")
         return all_resumes
     except Exception as e_oslistdir:
-        # This error will be displayed in the main UI body later
         logging.error(f"FindCandidatesPage: Failed to list or load PARSED RESUMES from folder '{folder_path}': {e_oslistdir}")
         return []
 
-# --- Load Global Resources for this page ---
 NLP_MODEL_PAGE = get_nlp_model_for_page()
 ALL_PARSED_RESUMES = load_all_parsed_resumes_from_folder(PARSED_RESUMES_FOLDER_PATH)
 
@@ -83,15 +74,14 @@ st.title("📄 Manually Enter Job Description to Find Candidates")
 st.write("Enter the job details below to find the most compatible resumes from our candidate database.")
 
 critical_page_error = False
-if NLP_MODEL_PAGE is None: # This check should now always work as NLP_MODEL_PAGE will be defined
+if NLP_MODEL_PAGE is None: 
     st.error("CRITICAL PAGE ERROR: spaCy NLP model 'en_core_web_md' could not be loaded. Matching functionality is disabled. Please check logs and ensure the model is downloaded.")
     critical_page_error = True
 
 if not ALL_PARSED_RESUMES:
     st.warning(f"Candidate resumes could not be loaded from the folder '{PARSED_RESUMES_FOLDER_PATH}'. "
                "Matching will be unavailable until this folder contains parsed resume JSON files.")
-    # If this is critical enough to stop the form, set critical_page_error = True
-    # For now, we allow the form but matching will fail if submitted.
+
 
 st.header("📝 Enter Job Details")
 
@@ -116,15 +106,14 @@ with st.form("manual_jd_form"):
     submitted = st.form_submit_button("Find Matching Candidates")
 
 if submitted:
-    if critical_page_error: # Check if NLP model failed to load earlier
+    if critical_page_error: #
         st.error("Cannot proceed with matching due to critical resource loading errors mentioned above.")
     elif not job_title_input.strip(): st.warning("Please enter a Job Title.")
     elif not skills_input.strip(): st.warning("Please enter Required Skills.")
     elif not job_description_text_input.strip(): st.warning("Please enter Job Description text.")
     elif not ALL_PARSED_RESUMES:
         st.error(f"No candidate resumes loaded from '{PARSED_RESUMES_FOLDER_PATH}'. Cannot perform matching.")
-    # elif NLP_MODEL_PAGE is None: # This specific check is now covered by critical_page_error
-    #     st.error("NLP Model for matching is not available. Cannot proceed.")
+    
     else:
         st.markdown("---"); st.subheader("⏳ Processing and Finding Matches...")
         manual_jd_skills = [skill.strip().lower() for skill in skills_input.split(',') if skill.strip()]
@@ -144,7 +133,6 @@ if submitted:
                 if not isinstance(resume_data_from_file, dict):
                     logging.warning(f"Skipping resume at index {idx} as it's not a dictionary.")
                     continue
-                # Pass the NLP_MODEL_PAGE to calculate_match_score
                 match_details = calculate_match_score(resume_data_from_file, manual_parsed_jd, NLP_MODEL_PAGE) 
                 
                 resume_identifier = f"Resume (Index {idx})" 
@@ -202,7 +190,7 @@ if submitted:
                         st.text_area(f"Resume Summary {i}", summary, height=100, disabled=True, label_visibility="collapsed", key=f"summary_exp_cand_{i}") # Unique key
 
                     st.markdown("---"); st.markdown("**Match Score Breakdown (vs this JD):**")
-                    cols_res = st.columns(2) # Ensure this is defined
+                    cols_res = st.columns(2) 
                     with cols_res[0]:
                         skill_dtls_res = details.get('skill_details', {})
                         st.metric(label="Skills Match", value=f"{skill_dtls_res.get('score',0)*100:.0f}%", 

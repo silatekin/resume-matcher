@@ -15,15 +15,15 @@ sys.path.insert(0,project_root)
 logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
 
 try:
-    from resume_parser_copy import parse_resume_file
+    from resume_parser import parse_resume_file
     from job_description_parser import parse_jd_file
     
-    from resume_parser_copy import (
+    from resume_parser import (
         NLP_MODEL_GLOBAL,
-        TECH_SKILLS_LIST_GLOBAL, # Assuming this is your globally loaded list of skills
-        TECH_SKILLS_SET_GLOBAL,  # Assuming this is the set version
-        SECTION_HEADERS_GLOBAL,  # This should be your complete section header config
-        EDUCATION_LEVELS_GLOBAL  # This should be your complete education levels config
+        TECH_SKILLS_LIST_GLOBAL, 
+        TECH_SKILLS_SET_GLOBAL,  
+        SECTION_HEADERS_GLOBAL,  
+        EDUCATION_LEVELS_GLOBAL  
     )
 
     if NLP_MODEL_GLOBAL is None:
@@ -35,7 +35,7 @@ except ImportError as e:
     print(f"Error importing parser functions: {e}")
     print("ACTION NEEDED: Edit the import statements above in prepare_test_data.py.")
     sys.exit(1)
-except AttributeError as e: # If a global variable is expected but not found in resume_parser
+except AttributeError as e: 
     logging.critical(f"Missing a required global variable in resume_parser.py: {e}")
     sys.exit(1)
 
@@ -62,11 +62,11 @@ else:
             try:
                 parsed_resume_dict = parse_resume_file(
                     file_path,
-                    NLP_MODEL_GLOBAL,          # The globally loaded NLP model
-                    TECH_SKILLS_LIST_GLOBAL, # The globally loaded skill list
-                    TECH_SKILLS_SET_GLOBAL,  # The globally loaded skill set
-                    SECTION_HEADERS_GLOBAL,  # The global section header configuration
-                    EDUCATION_LEVELS_GLOBAL  # The global education level configuration
+                    NLP_MODEL_GLOBAL,          
+                    TECH_SKILLS_LIST_GLOBAL, 
+                    TECH_SKILLS_SET_GLOBAL,  
+                    SECTION_HEADERS_GLOBAL,  
+                    EDUCATION_LEVELS_GLOBAL  
                 )
 
                 if parsed_resume_dict and isinstance(parsed_resume_dict,dict) and "error" not in parsed_resume_dict:
@@ -82,7 +82,6 @@ else:
                 else:
                     logging.warning(f"    WARNING: Parser did not return a valid dictionary for {filename} (returned None or unexpected type). Skipping save.")
             except Exception as e:
-                # Log the full traceback for unexpected errors during parsing of a file
                 logging.error(f"    ERROR processing {filename}: {e}", exc_info=True) 
     logging.info(f"Finished processing resumes. {processed_resume_count} resumes saved as JSON.")
 

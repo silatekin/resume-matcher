@@ -1,6 +1,5 @@
 import streamlit as st
-# --- Page Configuration MUST be the first Streamlit command ---
-st.set_page_config(layout="wide", page_title="Resume Matcher", initial_sidebar_state="expanded")
+st.set_page_config(layout="wide", page_title="Job Fit Analyzer", initial_sidebar_state="expanded",page_icon="🤖")
 
 from matcher import calculate_match_score 
 import json
@@ -92,7 +91,8 @@ if ALL_PARSED_JOBS_FULL_LIST:
             work_types_set.add(wt.strip())
     unique_work_types = sorted(list(work_types_set))
 
-st.title("🎯 Resume to Job Matcher")
+st.title("🎯 Job Fit Analyzer")
+st.subheader("Instantly see how your resume stacks up against job descriptions.")
 st.write("Upload your resume (TXT, DOCX, PDF) to find suitable job openings. Use the sidebar to filter jobs.")
 
 with st.sidebar:
@@ -167,7 +167,7 @@ if uploaded_file is not None:
                 SECTION_HEADERS_GLOBAL, EDUCATION_LEVELS_GLOBAL
             )
             processing_successful = False 
-            if parsed_resume_data and "error" not in parsed_resume_data: # Check for error key from parser
+            if parsed_resume_data and "error" not in parsed_resume_data: 
                 st.session_state.parsed_resume_data = parsed_resume_data 
                 processing_successful = True
                 logging.info(f"Resume '{uploaded_file.name}' processed successfully.")
@@ -204,9 +204,9 @@ if uploaded_file is not None:
                         st.markdown(f"**Company:** {company}")
                         st.markdown(f"**Dates:** {experience_entry.get('start_date', 'N/A')} - {experience_entry.get('end_date', 'N/A')}")
                         description = experience_entry.get("description", "")
-                        if description and str(description).strip(): # Ensure description is not None and not just whitespace
+                        if description and str(description).strip(): 
                             st.markdown("**Description:**")
-                            for desc_line in str(description).split('\n'): # Ensure description is string
+                            for desc_line in str(description).split('\n'): 
                                 st.markdown(f"- {desc_line.strip()}")
                         else:
                             st.markdown("**Description:** No description provided.")
@@ -256,7 +256,6 @@ if uploaded_file is not None:
                     st.text_area("raw_resume_text_display",
                                  str(data_to_display_resume.get("raw_text_snippet", "")),
                                  height=150, disabled=True, label_visibility="collapsed")
-            # --- END OF RESTORED RESUME DISPLAY ---
 
 
             st.markdown("---")
@@ -305,7 +304,7 @@ if uploaded_file is not None:
                         num_matches_to_show = st.slider(
                             "Number of top matches to display:", 
                             min_value=1, 
-                            max_value=max(2, min(20, len(sorted_matches))),
+                            max_value=max(2, min(40, len(sorted_matches))),
                             value=min(5, len(sorted_matches)), 
                             key="matches_slider"
                         )
@@ -391,15 +390,15 @@ if uploaded_file is not None:
                                 exp_val = "Met" if exp_dtls.get('score',0) == 1.0 else "Not Met" if exp_dtls.get('required_years') is not None else "N/A"
                                 st.metric(label="Experience Years", value=f"{exp_dtls.get('resume_years','N/A')} yrs", delta=f"{exp_val} (Req: {exp_dtls.get('required_years','N/A')} yrs)")
                                 
-                                # --- CORRECTED EDUCATION LOGIC ---
+                               
                                 edu_dtls = details.get('education_details', {})
                                 edu_score_val = edu_dtls.get('score', 0.0) 
                                 resume_level_code = edu_dtls.get('resume_level', -1)
-                                jd_req_level_code = edu_dtls.get('required_level', -1) # Should be an int from matcher
+                                jd_req_level_code = edu_dtls.get('required_level', -1)
 
                                 resume_level_display_text = get_education_text(resume_level_code)
                                 
-                                edu_delta_description = "Status: N/A" # Default delta text
+                                edu_delta_description = "Status: N/A" 
 
                                 if jd_req_level_code >= 0:  # A specific education level (0-5) is required by the JD
                                     jd_req_level_display_text = get_education_text(jd_req_level_code)
@@ -419,7 +418,7 @@ if uploaded_file is not None:
                                           value=f"Res: {resume_level_display_text}", 
                                           delta=edu_delta_description)
                                 
-                                # --- END OF CORRECTED EDUCATION DELTA LOGIC ---
+                             
                 else: 
                     st.info("No job matches found for this resume within the current filter criteria.")
             else: 

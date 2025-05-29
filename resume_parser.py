@@ -266,7 +266,7 @@ def parse_resume_sections(sections, kit: ParsingKit):
     #-------Summary Extraction--------
     if "summary" in sections:
         summary_text_content = sections["summary"]
-        parsed_resume["summary_text"] = summary_text_content.strip() # Store the raw summary text
+        parsed_resume["summary_text"] = summary_text_content.strip() 
         logging.info(f"Extracted summary section text (length: {len(parsed_resume['summary_text'])}).")
     else:
         logging.info("No 'summary' section found.")

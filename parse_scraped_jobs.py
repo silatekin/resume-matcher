@@ -51,7 +51,7 @@ def main():
 
     logging.info("\nStarting to parse job descriptions from the DataFrame...")
     
-    # Loop through all jobs
+
     for index, row in df_jobs.iterrows():
         original_title = row.get('title', 'N/A')
         original_company = row.get('company', 'N/A')
@@ -65,6 +65,7 @@ def main():
         api_company = str(row.get('company', '')) 
         api_location = str(row.get('location', '')) 
         
+        #" python , django, , api " -> ['python', 'django', 'api']
         api_tags_str = str(row.get('tags', ''))
         api_tags_list = [tag.strip() for tag in api_tags_str.split(',') if tag.strip()] if api_tags_str else []
 
@@ -81,11 +82,11 @@ def main():
             parsed_jd_data['original_epoch_time'] = row.get('epoch_time')
             parsed_jd_data['original_api_salary_min'] = row.get('api_salary_min')
             parsed_jd_data['original_api_salary_max'] = row.get('api_salary_max')
-            parsed_jd_data['original_id'] = row.get('id') # If you added 'id' in scraper.py
+            parsed_jd_data['original_id'] = row.get('id') 
             
             all_parsed_jds.append(parsed_jd_data)
             
-            # This print block is for detailed inspection of each job
+
             print(f"\n--- PARSED DATA FOR JOB: '{parsed_jd_data.get('job_title', original_title)}' ---")
             print(json.dumps(parsed_jd_data, indent=4, ensure_ascii=False))
             print(f"--- END OF PARSED DATA FOR: '{parsed_jd_data.get('job_title', original_title)}' ---")
