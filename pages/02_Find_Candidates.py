@@ -154,15 +154,9 @@ if submitted:
 
         st.markdown("---"); st.subheader(f"🏆 Top Candidate Matches for '{manual_parsed_jd['job_title']}'")
         if sorted_resume_matches:
-            num_to_show_key = "num_resume_matches_slider_candidates_page" 
-            if len(sorted_resume_matches) == 1: num_resume_matches_to_show = 1
-            elif len(sorted_resume_matches) > 1:
-                num_resume_matches_to_show = st.slider(
-                    "Number of top candidate resumes to display:", 1,
-                    max(2, min(10, len(sorted_resume_matches))), 
-                    min(3, len(sorted_resume_matches)), key=num_to_show_key
-                )
-            else: num_resume_matches_to_show = 0
+            num_resume_matches_to_show = len(sorted_resume_matches) 
+            st.write(f"Displaying all {num_resume_matches_to_show} candidate match(es):")
+
 
             for i, result_entry in enumerate(sorted_resume_matches[:num_resume_matches_to_show]):
                 resume_id_display = result_entry["resume_identifier"]
@@ -185,9 +179,40 @@ if submitted:
                     }
                     st.markdown(f"**Education Level:** {temp_edu_display_map.get(resume_edu_code, 'Unknown')}")
                     
-                    summary = original_resume.get("summary_text", "")
-                    if summary.strip():
+                    summary = original_resume.get("summary_text")
+                    if summary and summary.strip():
                         st.text_area(f"Resume Summary {i}", summary, height=100, disabled=True, label_visibility="collapsed", key=f"summary_exp_cand_{i}") # Unique key
+
+                    contact_info = original_resume.get("contact_info", {})
+                    if contact_info:
+                        st.markdown("**Contact:**")
+                        if contact_info.get("emails"):
+                            st.markdown(f"- Emails: {', '.join(contact_info['emails'])}")
+                        if contact_info.get("phones"):
+                            st.markdown(f"- Phones: {', '.join(contact_info['phones'])}")
+
+                    experience_list = original_resume.get("experience", [])
+                    if experience_list:
+                        st.markdown("**Recent Experience Highlights:**") 
+                        for exp_entry in experience_list[:3]:
+                            title = exp_entry.get("job_title", "N/A")
+                            company = exp_entry.get("company", "N/A")
+                            start_date = exp_entry.get("start_date", "N/A")
+                            end_date = exp_entry.get("end_date", "N/A")
+                            st.markdown(f"- **{title}** at {company} ({start_date} to {end_date})")
+                           
+                    education_details_list = original_resume.get("education_details", [])
+                    if education_details_list: 
+                        st.markdown("**Education Details:**")
+                        for edu_entry in education_details_list:
+                            degree = edu_entry.get("degree_mention", "N/A")
+                            institution = edu_entry.get("institution_mention", "N/A")
+                            date = edu_entry.get("date_mention", "N/A") 
+                            st.markdown(f"- {degree} from {institution} (Date: {date})")
+                    
+                    companies_worked = original_resume.get("companies", [])
+                    if companies_worked:
+                        st.markdown(f"**Companies Worked At:** {', '.join(companies_worked)}")
 
                     st.markdown("---"); st.markdown("**Match Score Breakdown (vs this JD):**")
                     cols_res = st.columns(2) 
