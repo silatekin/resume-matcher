@@ -1,0 +1,1 @@
+A Python system to automatically parse unstructured text from both resumes and job descriptions, extract key information, and implement a matching algorithm to score candidate relevance for specific roles.
